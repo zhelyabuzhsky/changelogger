@@ -4,5 +4,4 @@ cache: pip
 python:
   - '3.7'
 script:
-  - python manage.py collectstatic --clear
   - python manage.py test
