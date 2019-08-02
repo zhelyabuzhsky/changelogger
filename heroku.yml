@@ -2,4 +2,4 @@ build:
   docker:
     web: Dockerfile
 run:
-  web: gunicorn --access-logfile=- --error-logfile=- --log-level=info --reload changelogger.wsgi
+  web: gunicorn changelogger.wsgi
