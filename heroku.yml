@@ -4,6 +4,7 @@ build:
 release:
   command:
     - python manage.py migrate
+    - python manage.py collectstatic --noinput
   image: web
 run:
   web: gunicorn changelogger.wsgi
