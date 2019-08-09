@@ -11,6 +11,13 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 
+def all_projects(request):
+    template = loader.get_template("changelogs/all_projects.html")
+    all_projects_list = Project.objects.all()
+    context = {"all_projects_list": all_projects_list}
+    return HttpResponse(template.render(context, request))
+
+
 class ProjectViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows projects to be viewed or edited.
