@@ -13,7 +13,7 @@ def index(request):
 
 def all_projects(request):
     template = loader.get_template("changelogs/all_projects.html")
-    all_projects_list = Project.objects.all()
+    all_projects_list = Project.objects.order_by("pk").all()
     context = {"all_projects_list": all_projects_list}
     return HttpResponse(template.render(context, request))
 
