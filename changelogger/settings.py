@@ -1,5 +1,12 @@
 import os
 
+import environ
+
+env = environ.Env(
+    DEBUG=(bool, True),
+    DATABASE_URL=(str, 'sqlite:///db.sqlite3')
+)
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -9,10 +16,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '5wpk52^2#26*(^oj8&-l8ep$l%124v%(z8h*r8c5+v-v7rx38-'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['yetanotherchangelogger.herokuapp.com']
+ALLOWED_HOSTS = ['yetanotherchangelogger.herokuapp.com', '127.0.0.1']
 
 # Application definition
 
@@ -58,14 +64,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'changelogger.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    'default': env.db(),
 }
 
 # Password validation
