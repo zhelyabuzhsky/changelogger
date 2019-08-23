@@ -5,15 +5,17 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ('changelogs', '0003_version'),
-    ]
+    dependencies = [("changelogs", "0003_version")]
 
     operations = [
         migrations.AddField(
-            model_name='version',
-            name='project',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='changelogs.Project'),
+            model_name="version",
+            name="project",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="changelogs.Project",
+            ),
             preserve_default=False,
-        ),
+        )
     ]
