@@ -1,0 +1,5 @@
+{% load markdown_extras %}
+
+<h2>{{ version.project.title }}-{{ version.title }}</h2>
+<p class="text-secondary"><small>{{ version.date_time }}</small></p>
+<div>{{ version.body | markdown | safe }}</div>

@@ -1,11 +1,5 @@
 {% extends 'changelogs/base.html' %}
-{% load markdown_extras %}
 
 {% block content %}
-    <h1>{{ version.project.title }}-{{ version.title }}</h1>
-
-    <p class="text-secondary"><small>{{ version.date_time }}</small></p>
-
-    <p>{{ version.body | markdown | safe }}</p>
-
+    {% include "changelogs/version.html" with version=version %}
 {% endblock %}
