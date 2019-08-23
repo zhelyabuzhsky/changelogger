@@ -1,8 +1,10 @@
+from datetime import datetime
+
 from django.contrib.auth.models import User
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
-from .models import Project
+from .models import Project, Version
 from .views import my_projects
 
 
@@ -65,3 +67,29 @@ class MyProjectsViewTests(TestCase):
         self.assertContains(response, "https://github.com/django/django")
         self.assertNotContains(response, "requests")
         self.assertNotContains(response, "https://github.com/psf/requests")
+
+
+class VersionDetailTests(TestCase):
+    def test_success(self):
+        project_django = Project.objects.create(
+            title="django", url="https://github.com/django/django"
+        )
+        version_django_1 = Version.objects.create(
+            title="1.0.0",
+            date_time=datetime.now(),
+            project=project_django,
+            body="* change one* change two",
+        )
+        response = self.client.get(
+            reverse(
+                "changelogs:version_detail",
+                args=(project_django.id, version_django_1.id),
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "django-1.0.0")
+        self.assertContains(response, "change one")
+
+    def test_wrong_version(self):
+        response = self.client.get(reverse("changelogs:version_detail", args=(1, 1)))
+        self.assertEqual(response.status_code, 404)
