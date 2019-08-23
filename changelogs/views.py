@@ -21,7 +21,9 @@ def all_projects(request):
 
 def my_projects(request):
     template = loader.get_template("changelogs/my_projects.html")
-    my_projects_list = Project.objects.filter(subscribers=request.user).order_by("pk").all()
+    my_projects_list = (
+        Project.objects.filter(subscribers=request.user).order_by("pk").all()
+    )
     context = {"my_projects_list": my_projects_list}
     return HttpResponse(template.render(context, request))
 
