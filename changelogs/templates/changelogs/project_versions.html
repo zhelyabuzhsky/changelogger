@@ -1,0 +1,12 @@
+{% extends 'changelogs/base.html' %}
+{% load markdown_extras %}
+
+{% block content %}
+    <h1>{{ project.title }}</h1>
+
+    {% for version in project.versions %}
+        <h2><a href="{% url 'changelogs:version_detail' project.id version.id %}">{{ version.title }}</a></h2>
+        {% include "changelogs/_version.html" with version=version %}
+    {% endfor %}
+
+{% endblock %}
