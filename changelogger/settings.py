@@ -106,6 +106,6 @@ sentry_sdk.init(
     integrations=[DjangoIntegration()],
 )
 
-LOGOUT_REDIRECT_URL = 'changelogs:index'
-LOGIN_REDIRECT_URL = 'changelogs:index'
-LOGIN_URL = 'login'
+LOGOUT_REDIRECT_URL = "changelogs:index"
+LOGIN_REDIRECT_URL = "changelogs:index"
+LOGIN_URL = "login"
