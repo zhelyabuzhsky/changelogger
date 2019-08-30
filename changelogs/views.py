@@ -32,8 +32,8 @@ def feed(request):
     template = loader.get_template("changelogs/feed.html")
     versions = (
         Version.objects.filter(project__subscribers=request.user)
-            .order_by("date_time")
-            .all()
+        .order_by("date_time")
+        .all()
     )
     context = {"versions": versions}
     return HttpResponse(template.render(context, request))
