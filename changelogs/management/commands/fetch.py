@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from typing import List, Dict
 
@@ -13,9 +14,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         def fetch_github_project(project: Project) -> None:
             def run_github_grahql_query(query: str) -> Dict:
-                headers = {
-                    "Authorization": "Bearer dbcdd2aaadf088418aea4833fb03df7012383638"
-                }
+                headers = {"Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}"}
                 request = requests.post(
                     "https://api.github.com/graphql",
                     json={"query": query},
