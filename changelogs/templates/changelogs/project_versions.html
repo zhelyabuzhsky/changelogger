@@ -5,8 +5,10 @@
     <h1>{{ project.title }}</h1>
 
     {% for version in project.versions %}
-        <h2><a href="{% url 'changelogs:version_detail' project.id version.id %}">{{ version.title }}</a></h2>
-        {% include "changelogs/_version.html" with version=version %}
+        <div class="my-4">
+            <h2><a href="{% url 'changelogs:version_detail' project.id version.id %}">{{ version.title }}</a></h2>
+            {% include "changelogs/_version.html" with version=version %}
+        </div>
     {% endfor %}
 
 {% endblock %}
