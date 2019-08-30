@@ -4,7 +4,11 @@ import environ
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
-env = environ.Env(DEBUG=(bool, False), DATABASE_URL=(str, "sqlite:///db.sqlite3"), SENTRY_DSN=(str, ""))
+env = environ.Env(
+    DEBUG=(bool, False),
+    DATABASE_URL=(str, "sqlite:///db.sqlite3"),
+    SENTRY_DSN=(str, ""),
+)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -102,7 +106,4 @@ REST_FRAMEWORK = {
 }
 
 if not DEBUG:
-    sentry_sdk.init(
-        dsn=env("SENTRY_DSN"),
-        integrations=[DjangoIntegration()]
-    )
+    sentry_sdk.init(dsn=env("SENTRY_DSN"), integrations=[DjangoIntegration()])
