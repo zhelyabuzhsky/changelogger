@@ -101,8 +101,8 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
 }
 
-if not DEBUG:
-    sentry_sdk.init(
-        dsn="https://72cde10d9c2f4bce81b6f032a92ddba0@sentry.io/1546623",
-        integrations=[DjangoIntegration()],
-    )
+# if not DEBUG:
+#     sentry_sdk.init(
+#         dsn="https://72cde10d9c2f4bce81b6f032a92ddba0@sentry.io/1546623",
+#         integrations=[DjangoIntegration()],
+#     )
