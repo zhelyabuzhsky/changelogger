@@ -4,7 +4,7 @@ import environ
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
-env = environ.Env(DEBUG=(bool, False), DATABASE_URL=(str, "sqlite:///db.sqlite3"))
+env = environ.Env(DEBUG=(bool, True), DATABASE_URL=(str, "sqlite:///db.sqlite3"))
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
