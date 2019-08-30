@@ -20,6 +20,10 @@ class Project(models.Model):
     def repository_name(self):
         return urlparse(self.url).path.split("/")[2]
 
+    @property
+    def versions(self):
+        return Version.objects.filter(project=self)
+
     def __str__(self):
         return f"{self.title} ({self.url})"
 

@@ -1,5 +1,6 @@
 {% extends 'changelogs/base.html' %}
 
 {% block content %}
-    {% include "changelogs/version.html" with version=version %}
+    <h1>{{ version.project.title }}-{{ version.title }}</h1>
+    {% include "changelogs/_version.html" with version=version %}
 {% endblock %}

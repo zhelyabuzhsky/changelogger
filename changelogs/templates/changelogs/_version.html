@@ -1,0 +1,5 @@
+{% load markdown_extras %}
+
+<p class="text-secondary"><small>{{ version.date_time }}</small></p>
+
+<p>{{ version.body | markdown | safe }}</p>
