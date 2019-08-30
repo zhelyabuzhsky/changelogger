@@ -100,10 +100,10 @@ class ProjectModelTests(TestCase):
         sentry_project = Project.objects.create(
             title="Sentry", url="https://github.com/getsentry/sentry"
         )
-        self.assertEqual(sentry_project.repository_owner, 'getsentry')
+        self.assertEqual(sentry_project.repository_owner, "getsentry")
 
     def test_repository_name_property(self):
         sentry_project = Project.objects.create(
             title="Sentry", url="https://github.com/getsentry/sentry"
         )
-        self.assertEqual(sentry_project.repository_name, 'sentry')
+        self.assertEqual(sentry_project.repository_name, "sentry")

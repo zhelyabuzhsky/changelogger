@@ -14,11 +14,11 @@ class Project(models.Model):
 
     @property
     def repository_owner(self):
-        return urlparse(self.url).path.split('/')[1]
+        return urlparse(self.url).path.split("/")[1]
 
     @property
     def repository_name(self):
-        return urlparse(self.url).path.split('/')[2]
+        return urlparse(self.url).path.split("/")[2]
 
     def __str__(self):
         return f"{self.title} ({self.url})"

@@ -8,18 +8,27 @@ from ...models import Project, Version
 
 
 class Command(BaseCommand):
-    help = 'Closes the specified poll for voting'
+    help = "Closes the specified poll for voting"
 
     def handle(self, *args, **options):
         def fetch_github_project(project: Project) -> None:
             def run_github_grahql_query(query: str) -> Dict:
-                headers = {"Authorization": "Bearer dbcdd2aaadf088418aea4833fb03df7012383638"}
-                request = requests.post('https://api.github.com/graphql', json={'query': query}, headers=headers)
+                headers = {
+                    "Authorization": "Bearer dbcdd2aaadf088418aea4833fb03df7012383638"
+                }
+                request = requests.post(
+                    "https://api.github.com/graphql",
+                    json={"query": query},
+                    headers=headers,
+                )
                 if request.status_code == 200:
                     return request.json()
                 else:
                     raise Exception(
-                        "Query failed to run by returning code of {}. {}".format(request.status_code, query))
+                        "Query failed to run by returning code of {}. {}".format(
+                            request.status_code, query
+                        )
+                    )
 
             query = """
             {
@@ -35,18 +44,23 @@ class Command(BaseCommand):
                 }
               }
             }
-            """ % (project.repository_owner, project.repository_name)
+            """ % (
+                project.repository_owner,
+                project.repository_name,
+            )
 
             response = run_github_grahql_query(query)
 
-            releases: List[Dict] = response['data']['repository']['releases']['edges']
+            releases: List[Dict] = response["data"]["repository"]["releases"]["edges"]
 
             for release in releases:
                 Version.objects.create(
-                    title=release['node']['tagName'],
-                    date_time=datetime.strptime(release['node']['publishedAt'], "%Y-%m-%dT%H:%M:%SZ"),
+                    title=release["node"]["tagName"],
+                    date_time=datetime.strptime(
+                        release["node"]["publishedAt"], "%Y-%m-%dT%H:%M:%SZ"
+                    ),
                     project=project,
-                    body=release['node']['description'],
+                    body=release["node"]["description"],
                 )
 
         projects = Project.objects.all()
@@ -54,4 +68,4 @@ class Command(BaseCommand):
         for project in projects:
             fetch_github_project(project)
 
-        self.stdout.write(self.style.SUCCESS('Successfully fetched changlogs'))
+        self.stdout.write(self.style.SUCCESS("Successfully fetched changlogs"))
