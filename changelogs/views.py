@@ -28,11 +28,21 @@ def my_projects(request):
     return HttpResponse(template.render(context, request))
 
 
+def project_detail(request, project_id: int):
+    template = loader.get_template("changelogs/project_detail.html")
+    try:
+        project = Project.objects.get(pk=project_id)
+    except Project.DoesNotExist:
+        raise Http404("Project does not exist")
+    context = {"project": project}
+    return HttpResponse(template.render(context, request))
+
+
 def project_versions(request, project_id: int):
     template = loader.get_template("changelogs/project_versions.html")
     try:
         project = Project.objects.get(pk=project_id)
-    except Version.DoesNotExist:
+    except Project.DoesNotExist:
         raise Http404("Project does not exist")
     context = {"project": project}
     return HttpResponse(template.render(context, request))

@@ -1,0 +1,21 @@
+{% extends 'changelogs/base.html' %}
+{% load markdown_extras %}
+
+{% block content %}
+    <h1>{{ project.title }}</h1>
+
+    <span>URL: {{ project.url }}</span>
+
+    <div class="my-4">
+        <ul>
+            {% for version in project.versions|slice:":5" %}
+                <li>
+                    <span class="text-secondary">{{ version.date_time }}</span> <a
+                        href="{% url 'changelogs:version_detail' project.id version.id %}">{{ version.title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <a href="{% url 'changelogs:project_versions' project.id %}">All versions →</a>
+{% endblock %}

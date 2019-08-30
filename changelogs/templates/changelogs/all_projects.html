@@ -15,7 +15,7 @@
             {% for project in all_projects_list %}
                 <tr>
                     <th scope="row">{{ project.id }}</th>
-                    <td>{{ project.title }}</td>
+                    <td><a href="{% url 'changelogs:project_detail' project.id %}">{{ project.title }}</a></td>
                     <td>{{ project.url }}</td>
                 </tr>
             {% endfor %}
