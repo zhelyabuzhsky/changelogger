@@ -28,6 +28,17 @@ def my_projects(request):
     return HttpResponse(template.render(context, request))
 
 
+def feed(request):
+    template = loader.get_template("changelogs/feed.html")
+    versions = (
+        Version.objects.filter(project__subscribers=request.user)
+        .order_by("date_time")
+        .all()
+    )
+    context = {"versions": versions}
+    return HttpResponse(template.render(context, request))
+
+
 def project_detail(request, project_id: int):
     template = loader.get_template("changelogs/project_detail.html")
     try:
