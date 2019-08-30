@@ -93,3 +93,17 @@ class VersionDetailTests(TestCase):
     def test_wrong_version(self):
         response = self.client.get(reverse("changelogs:version_detail", args=(1, 1)))
         self.assertEqual(response.status_code, 404)
+
+
+class ProjectModelTests(TestCase):
+    def test_repository_owner_property(self):
+        sentry_project = Project.objects.create(
+            title="Sentry", url="https://github.com/getsentry/sentry"
+        )
+        self.assertEqual(sentry_project.repository_owner, 'getsentry')
+
+    def test_repository_name_property(self):
+        sentry_project = Project.objects.create(
+            title="Sentry", url="https://github.com/getsentry/sentry"
+        )
+        self.assertEqual(sentry_project.repository_name, 'sentry')
