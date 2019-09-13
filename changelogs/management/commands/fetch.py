@@ -9,7 +9,7 @@ from ...models import Project, Version
 
 
 class Command(BaseCommand):
-    help = "Closes the specified poll for voting"
+    help = "Fetches all projects changelogs"
 
     def handle(self, *args, **options):
         def fetch_github_project(project: Project) -> None:
@@ -53,14 +53,15 @@ class Command(BaseCommand):
             releases: List[Dict] = response["data"]["repository"]["releases"]["edges"]
 
             for release in releases:
-                Version.objects.create(
-                    title=release["node"]["tagName"],
-                    date_time=datetime.strptime(
-                        release["node"]["publishedAt"], "%Y-%m-%dT%H:%M:%SZ"
-                    ),
-                    project=project,
-                    body=release["node"]["description"],
-                )
+                if not Version.objects.filter(project=project, title=release["node"]["tagName"]).exists():
+                    Version.objects.create(
+                        title=release["node"]["tagName"],
+                        date_time=datetime.strptime(
+                            release["node"]["publishedAt"], "%Y-%m-%dT%H:%M:%SZ"
+                        ),
+                        project=project,
+                        body=release["node"]["description"],
+                    )
 
         projects = Project.objects.all()
 
