@@ -36,8 +36,8 @@ def feed(request):
     if request.user.is_authenticated:
         versions = (
             Version.objects.filter(project__subscribers=request.user)
-                .order_by("date_time")
-                .all()
+            .order_by("date_time")
+            .all()
         )
     else:
         versions = (
