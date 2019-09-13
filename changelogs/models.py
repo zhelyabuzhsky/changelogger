@@ -10,6 +10,7 @@ class Project(models.Model):
 
     title = models.CharField(max_length=200)
     url = models.URLField(max_length=200)
+    is_public = models.BooleanField(default=False)
     subscribers = models.ManyToManyField(User, blank=True)
 
     @property
