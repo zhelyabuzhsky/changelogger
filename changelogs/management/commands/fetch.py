@@ -53,7 +53,9 @@ class Command(BaseCommand):
             releases: List[Dict] = response["data"]["repository"]["releases"]["edges"]
 
             for release in releases:
-                if not Version.objects.filter(project=project, title=release["node"]["tagName"]).exists():
+                if not Version.objects.filter(
+                    project=project, title=release["node"]["tagName"]
+                ).exists():
                     Version.objects.create(
                         title=release["node"]["tagName"],
                         date_time=datetime.strptime(
