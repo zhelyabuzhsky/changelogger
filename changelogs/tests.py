@@ -12,7 +12,7 @@ class IndexViewTests(TestCase):
     def test_success(self):
         response = self.client.get(reverse("changelogs:index"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Collector for your changelogs")
+        self.assertContains(response, "Collector for changelogs")
 
 
 class AllProjectsViewTests(TestCase):
