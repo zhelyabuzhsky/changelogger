@@ -1,9 +1,0 @@
-dist: xenial
-language: python
-cache: pip
-python:
-  - '3.7'
-script:
-  - black --check .
-  - python manage.py collectstatic --clear --noinput
-  - python manage.py test
