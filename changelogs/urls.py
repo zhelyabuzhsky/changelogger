@@ -7,6 +7,7 @@ app_name = "changelogs"
 
 router = routers.DefaultRouter()
 router.register(r"projects", views.ProjectViewSet)
+router.register(r"versions", views.VersionViewSet)
 
 urlpatterns = [
     path("", views.index, name="index"),
