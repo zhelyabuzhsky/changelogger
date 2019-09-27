@@ -34,15 +34,9 @@ def feed(request):
     template = loader.get_template("changelogs/feed.html")
 
     if request.user.is_authenticated:
-        versions = (
-            Version.objects.filter(project__subscribers=request.user)
-            .order_by("date_time")
-            .all()
-        )
+        versions = Version.objects.filter(project__subscribers=request.user).all()
     else:
-        versions = (
-            Version.objects.filter(project__is_public=True).order_by("date_time").all()
-        )
+        versions = Version.objects.filter(project__is_public=True).all()
 
     context = {"versions": versions}
     return HttpResponse(template.render(context, request))
