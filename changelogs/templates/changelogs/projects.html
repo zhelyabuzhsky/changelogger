@@ -6,7 +6,9 @@
         <ul>
             {% for project in projects_list %}
                 <li><a href="{% url 'changelogs:project_detail' project.id %}">{{ project.title }}</a>
-                    ({{ project.url }})
+                    (<a href="{{ project.url }}" target="_blank">{{ project.url }}</a> <i
+                            class="fas fa-external-link-alt"></i>)
+
                 </li>
             {% endfor %}
         </ul>
