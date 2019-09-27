@@ -17,6 +17,9 @@ jobs:
         run: |
           pip install black
           black --check .
+      - name: Collect static
+        run: |
+          python manage.py collectstatic --clear --noinput
       - name: Test with pytest
         run: |
           python manage.py test
