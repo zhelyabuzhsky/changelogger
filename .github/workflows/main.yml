@@ -19,7 +19,7 @@ jobs:
           black --check .
       - name: Collect static
         run: |
-          python manage.py collectstatic --clear --noinput
-      - name: Test with pytest
+          python manage.py collectstatic --noinput
+      - name: Run tests
         run: |
           python manage.py test
