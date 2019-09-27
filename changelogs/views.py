@@ -4,7 +4,7 @@ from django.template import loader
 from rest_framework import viewsets
 
 from .models import Project, Version
-from .serializers import ProjectSerializer
+from .serializers import ProjectSerializer, VersionSerializer
 
 
 def index(request):
@@ -85,3 +85,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+
+
+class VersionViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows versions to be viewed or edited.
+    """
+
+    queryset = Version.objects.all()
+    serializer_class = VersionSerializer
