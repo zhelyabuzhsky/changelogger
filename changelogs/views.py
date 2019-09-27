@@ -8,7 +8,6 @@ from .serializers import ProjectSerializer, VersionSerializer
 
 
 def index(request):
-    123/0
     template = loader.get_template("changelogs/index.html")
     context = {}
     return HttpResponse(template.render(context, request))
