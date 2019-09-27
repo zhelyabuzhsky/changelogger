@@ -32,6 +32,7 @@ class Project(models.Model):
 class Version(models.Model):
     class Meta:
         db_table = "versions"
+        ordering = ["-date_time"]
 
     title = models.CharField(max_length=20)
     date_time = models.DateTimeField()
