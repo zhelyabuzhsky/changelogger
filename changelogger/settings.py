@@ -102,10 +102,11 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.DjangoModelPermissions"],
 }
 
-sentry_sdk.init(
-    dsn="https://72cde10d9c2f4bce81b6f032a92ddba0@sentry.io/1546623",
-    integrations=[DjangoIntegration()],
-)
+if not DEBUG:
+    sentry_sdk.init(
+        dsn="https://72cde10d9c2f4bce81b6f032a92ddba0@sentry.io/1546623",
+        integrations=[DjangoIntegration()],
+    )
 
 LOGOUT_REDIRECT_URL = "changelogs:index"
 LOGIN_REDIRECT_URL = "changelogs:index"
