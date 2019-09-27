@@ -11,9 +11,8 @@ router.register(r"versions", views.VersionViewSet)
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path("projects/all/", views.all_projects, name="all_projects"),
-    path("projects/my/", views.my_projects, name="my_projects"),
     path("feed/", views.feed, name="feed"),
+    path("projects/", views.projects, name="projects"),
     path("projects/<int:project_id>/", views.project_detail, name="project_detail"),
     path(
         "projects/<int:project_id>/versions/",

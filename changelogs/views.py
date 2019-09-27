@@ -1,4 +1,3 @@
-from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
 from django.template import loader
 from rest_framework import viewsets
@@ -13,23 +12,6 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 
-def all_projects(request):
-    template = loader.get_template("changelogs/all_projects.html")
-    all_projects_list = Project.objects.order_by("pk").all()
-    context = {"all_projects_list": all_projects_list}
-    return HttpResponse(template.render(context, request))
-
-
-@login_required
-def my_projects(request):
-    template = loader.get_template("changelogs/my_projects.html")
-    my_projects_list = (
-        Project.objects.filter(subscribers=request.user).order_by("pk").all()
-    )
-    context = {"my_projects_list": my_projects_list}
-    return HttpResponse(template.render(context, request))
-
-
 def feed(request):
     template = loader.get_template("changelogs/feed.html")
 
@@ -39,6 +21,19 @@ def feed(request):
         versions = Version.objects.filter(project__is_public=True).all()
 
     context = {"versions": versions}
+    return HttpResponse(template.render(context, request))
+
+
+def projects(request):
+    template = loader.get_template("changelogs/projects.html")
+    if request.user.is_authenticated:
+        projects_list = (
+            Project.objects.filter(subscribers=request.user).order_by("pk").all()
+        )
+    else:
+        projects_list = Project.objects.filter(is_public=True).order_by("pk").all()
+
+    context = {"projects_list": projects_list}
     return HttpResponse(template.render(context, request))
 
 
