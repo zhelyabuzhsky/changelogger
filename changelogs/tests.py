@@ -111,3 +111,15 @@ class ProjectModelTests(TestCase):
             title="Sentry", url="https://github.com/getsentry/sentry"
         )
         self.assertEqual(sentry_project.repository_name, "sentry")
+
+    def test_is_github_property_true(self):
+        sentry_project = Project.objects.create(
+            title="Sentry", url="https://github.com/getsentry/sentry"
+        )
+        self.assertTrue(sentry_project.is_github_project)
+
+    def test_is_github_property_false(self):
+        gitlab_project = Project.objects.create(
+            title="GitLab", url="https://gitlab.com/gitlab-org/gitlab"
+        )
+        self.assertFalse(gitlab_project.is_github_project)

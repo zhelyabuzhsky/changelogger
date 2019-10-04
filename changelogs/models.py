@@ -3,6 +3,8 @@ from urllib.parse import urlparse
 from django.contrib.auth.models import User
 from django.db import models
 
+GITHUB_DOMAIN_NAME = "github.com"
+
 
 class Project(models.Model):
     class Meta:
@@ -24,6 +26,10 @@ class Project(models.Model):
     @property
     def versions(self):
         return Version.objects.filter(project=self)
+
+    @property
+    def is_github_project(self) -> bool:
+        return urlparse(self.url).netloc == GITHUB_DOMAIN_NAME
 
     def __str__(self):
         return f"{self.title} ({self.url})"
