@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group, Permission
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from rest_framework import status
@@ -23,6 +23,9 @@ class ProjectsViewTests(TestCase):
         self.user = User.objects.create_user(
             username="jacob", email="jacob@mail.com", password="top_secret"
         )
+
+    def tearDown(self):
+        self.user.delete()
 
     def test_no_projects(self):
         response = self.client.get(reverse("changelogs:projects"))
@@ -129,14 +132,53 @@ class ProjectModelTests(TestCase):
 
 class RestApiTests(APITestCase):
     def setUp(self):
+        self.group = Group.objects.create(name="Users")
+        self.group.permissions.add(Permission.objects.get(name="Can view project"))
+        self.group.permissions.add(Permission.objects.get(name="Can view version"))
+        self.group.permissions.add(Permission.objects.get(name="Can add version"))
+        self.group.permissions.add(Permission.objects.get(name="Can change version"))
+        self.group.permissions.add(Permission.objects.get(name="Can delete version"))
+
         self.user = User.objects.create_user(
-            username="jacob",
-            email="jacob@mail.com",
-            password="top_secret",
-            is_superuser=True,
+            username="jacob", email="jacob@mail.com", password="top_secret"
+        )
+        self.user.groups.add(self.group)
+
+    def tearDown(self):
+        self.user.delete()
+        self.group.delete()
+
+    def test_create_new_version_anonymous(self):
+        response = self.client.post(
+            "/api/versions/",
+            {
+                "title": "0.1.0",
+                "date_time": datetime.now(),
+                "body": "small fixes",
+                "project": 1,
+            },
         )
 
-    def test_create_new_version(self):
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create_new_version_wrong_permissions(self):
+        self.group.permissions.remove(Permission.objects.get(name="Can add version"))
+
+        self.client.force_authenticate(user=self.user)
+
+        response = self.client.post(
+            "/api/versions/",
+            {
+                "title": "0.1.0",
+                "date_time": datetime.now(),
+                "body": "small fixes",
+                "project": 1,
+            },
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create_new_version_successful(self):
         sentry_project = Project.objects.create(
             title="Sentry", url="https://github.com/getsentry/sentry"
         )
