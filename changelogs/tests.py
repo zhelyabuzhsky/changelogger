@@ -3,6 +3,8 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
 
 from .models import Project, Version
 from .views import projects
@@ -123,3 +125,37 @@ class ProjectModelTests(TestCase):
             title="GitLab", url="https://gitlab.com/gitlab-org/gitlab"
         )
         self.assertFalse(gitlab_project.is_github_project)
+
+
+class RestApiTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="jacob",
+            email="jacob@mail.com",
+            password="top_secret",
+            is_superuser=True,
+        )
+
+    def test_create_new_version(self):
+        sentry_project = Project.objects.create(
+            title="Sentry", url="https://github.com/getsentry/sentry"
+        )
+
+        self.assertEqual(Version.objects.count(), 0)
+
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(
+            "/api/versions/",
+            {
+                "title": "0.1.0",
+                "date_time": datetime.now(),
+                "body": "small fixes",
+                "project": sentry_project.id,
+            },
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Version.objects.count(), 1)
+        version = Version.objects.first()
+        self.assertEqual(version.project_id, sentry_project.id)
+        self.assertEqual(version.body, "small fixes")
