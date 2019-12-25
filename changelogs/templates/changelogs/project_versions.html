@@ -1,7 +1,7 @@
 {% extends 'changelogs/base.html' %}
 
 {% block content %}
-    <h1>{{ project.title }}</h1>
+    <h1 class="display-4">{{ project.title }}</h1>
 
     {% for version in project.versions %}
         <div class="my-4">

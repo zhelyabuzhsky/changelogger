@@ -2,7 +2,7 @@
 
 {% block content %}
     {% if projects_list %}
-        <h2>Projects</h2>
+        <h2 class="display-4">Projects</h2>
         <ul>
             {% for project in projects_list %}
                 <li><a href="{% url 'changelogs:project_detail' project.id %}">{{ project.title }}</a>
