@@ -1,7 +1,7 @@
-from datetime import datetime
+import datetime
 
-from django.contrib.auth.models import User, Group, Permission
-from django.test import TestCase, RequestFactory
+from django.contrib.auth.models import Group, Permission, User
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -85,7 +85,7 @@ class VersionDetailTests(TestCase):
         )
         version_django_1 = Version.objects.create(
             title="1.0.0",
-            date_time=datetime.now(),
+            date_time=datetime.datetime.now(),
             project=project_django,
             body="* change one* change two",
         )
@@ -153,7 +153,7 @@ class RestApiTests(APITestCase):
             "/api/versions/",
             {
                 "title": "0.1.0",
-                "date_time": datetime.now(),
+                "date_time": datetime.datetime.now(),
                 "body": "small fixes",
                 "project": 1,
             },
@@ -170,7 +170,7 @@ class RestApiTests(APITestCase):
             "/api/versions/",
             {
                 "title": "0.1.0",
-                "date_time": datetime.now(),
+                "date_time": datetime.datetime.now(),
                 "body": "small fixes",
                 "project": 1,
             },
@@ -190,7 +190,7 @@ class RestApiTests(APITestCase):
             "/api/versions/",
             {
                 "title": "0.1.0",
-                "date_time": datetime.now(),
+                "date_time": datetime.datetime.now(),
                 "body": "small fixes",
                 "project": sentry_project.id,
             },
@@ -201,3 +201,38 @@ class RestApiTests(APITestCase):
         version = Version.objects.first()
         self.assertEqual(version.project_id, sentry_project.id)
         self.assertEqual(version.body, "small fixes")
+
+    def test_view_version_successful(self):
+        project_django = Project.objects.create(
+            title="django", url="https://github.com/django/django"
+        )
+        project_django.subscribers.add(self.user)
+        version_django_1 = Version.objects.create(
+            title="1.0.0",
+            date_time=datetime.date(2019, 12, 4),
+            project=project_django,
+            body="* change one* change two",
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f"/api/versions/{version_django_1.id}/")
+        self.assertEqual(
+            response.json(),
+            {
+                'body': '* change one* change two',
+                'date_time': '2019-12-04T00:00:00Z',
+                'id': 1,
+                'project': 1,
+                'title': '1.0.0'
+            }
+        )
+
+    def test_view_project_successful(self):
+        project_django = Project.objects.create(
+            title="django", url="https://github.com/django/django"
+        )
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f"/api/projects/{project_django.id}/")
+        self.assertEqual(
+            response.json(),
+            {"id": 1, "title": "django", "url": "https://github.com/django/django"}
+        )
