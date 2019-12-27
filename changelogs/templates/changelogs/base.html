@@ -35,6 +35,11 @@
         </ul>
         <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
             <ul class="navbar-nav ml-auto">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'changelogs:cabinet' %}">{{ user.username }}</a>
+                    </li>
+                {% endif %}
                 <li class="nav-item">
                     {% if user.is_authenticated %}
                         <a class="nav-link" href="{% url 'logout' %}">Logout</a>
