@@ -218,12 +218,12 @@ class RestApiTests(APITestCase):
         self.assertEqual(
             response.json(),
             {
-                'body': '* change one* change two',
-                'date_time': '2019-12-04T00:00:00Z',
-                'id': 1,
-                'project': 1,
-                'title': '1.0.0'
-            }
+                "body": "* change one* change two",
+                "date_time": "2019-12-04T00:00:00Z",
+                "id": 1,
+                "project": 1,
+                "title": "1.0.0",
+            },
         )
 
     def test_view_project_successful(self):
@@ -234,5 +234,5 @@ class RestApiTests(APITestCase):
         response = self.client.get(f"/api/projects/{project_django.id}/")
         self.assertEqual(
             response.json(),
-            {"id": 1, "title": "django", "url": "https://github.com/django/django"}
+            {"id": 1, "title": "django", "url": "https://github.com/django/django"},
         )
