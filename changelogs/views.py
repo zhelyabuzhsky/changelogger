@@ -67,6 +67,12 @@ def version_detail(request, project_id: int, version_id: int):
     return HttpResponse(template.render(context, request))
 
 
+def cabinet(request):
+    template = loader.get_template("changelogs/cabinet.html")
+    context = {"user": request.user}
+    return HttpResponse(template.render(context, request))
+
+
 class ProjectViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows projects to be viewed or edited.
