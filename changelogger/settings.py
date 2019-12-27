@@ -17,7 +17,7 @@ SECRET_KEY = "5wpk52^2#26*(^oj8&-l8ep$l%124v%(z8h*r8c5+v-v7rx38-"
 
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = ["yetanotherchangelogger.herokuapp.com", "127.0.0.1"]
+ALLOWED_HOSTS = ["yourchangelogs.herokuapp.com", "yourchangelogs.com", "127.0.0.1"]
 
 # Application definition
 
