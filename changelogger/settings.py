@@ -112,3 +112,8 @@ if not DEBUG:
 LOGOUT_REDIRECT_URL = "changelogs:index"
 LOGIN_REDIRECT_URL = "changelogs:index"
 LOGIN_URL = "login"
+
+# e-mail service sendgrid.com
+SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY", "no_sendgrid_api_key")
+
+NOREPLY_EMAIL_ADDRESS = "noreply@yourchangelogs.com"

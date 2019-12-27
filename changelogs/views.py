@@ -8,6 +8,7 @@ from rest_framework import viewsets
 
 from .models import Project, Version
 from .serializers import ProjectSerializer, VersionSerializer
+from .services import send_email_notifications
 
 
 def index(request):
@@ -100,6 +101,8 @@ class AddVersionView(View):
             body=request.POST.get("body"),
         )
         version.save()
+
+        send_email_notifications(version)
 
         return HttpResponseRedirect(
             reverse("changelogs:project_versions", args=(project.id,))
