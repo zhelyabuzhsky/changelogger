@@ -94,14 +94,16 @@ class AddVersionView(View):
             raise Http404("Project does not exist")
 
         version = Version(
-            title=request.POST.get('title'),
+            title=request.POST.get("title"),
             date_time=datetime.datetime.now(),
             project=project,
-            body=request.POST.get('body')
+            body=request.POST.get("body"),
         )
         version.save()
 
-        return HttpResponseRedirect(reverse('changelogs:project_versions', args=(project.id,)))
+        return HttpResponseRedirect(
+            reverse("changelogs:project_versions", args=(project.id,))
+        )
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
