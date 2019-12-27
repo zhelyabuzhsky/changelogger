@@ -1,5 +1,9 @@
-from django.http import HttpResponse, Http404
+import datetime
+
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.template import loader
+from django.urls import reverse
+from django.views import View
 from rest_framework import viewsets
 
 from .models import Project, Version
@@ -71,6 +75,33 @@ def cabinet(request):
     template = loader.get_template("changelogs/cabinet.html")
     context = {"user": request.user}
     return HttpResponse(template.render(context, request))
+
+
+class AddVersionView(View):
+    def get(self, request, project_id: int):
+        template = loader.get_template("changelogs/add_version.html")
+        try:
+            project = Project.objects.get(pk=project_id)
+        except Project.DoesNotExist:
+            raise Http404("Project does not exist")
+        context = {"project": project}
+        return HttpResponse(template.render(context, request))
+
+    def post(self, request, project_id: int):
+        try:
+            project = Project.objects.get(pk=project_id)
+        except Project.DoesNotExist:
+            raise Http404("Project does not exist")
+
+        version = Version(
+            title=request.POST.get('title'),
+            date_time=datetime.datetime.now(),
+            project=project,
+            body=request.POST.get('body')
+        )
+        version.save()
+
+        return HttpResponseRedirect(reverse('changelogs:project_versions', args=(project.id,)))
 
 
 class ProjectViewSet(viewsets.ModelViewSet):

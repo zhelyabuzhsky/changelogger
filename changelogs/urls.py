@@ -25,6 +25,11 @@ urlpatterns = [
         views.version_detail,
         name="version_detail",
     ),
+    path(
+        "projects/<int:project_id>/versions/add",
+        views.AddVersionView.as_view(),
+        name="add_version",
+    ),
     path("api/", include(router.urls)),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
 ]
