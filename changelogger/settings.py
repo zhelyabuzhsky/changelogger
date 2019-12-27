@@ -1,10 +1,7 @@
 import os
 
-import environ
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
-
-env = environ.Env(DEBUG=(bool, True), DATABASE_URL=(str, "sqlite:///db.sqlite3"))
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -15,7 +12,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "5wpk52^2#26*(^oj8&-l8ep$l%124v%(z8h*r8c5+v-v7rx38-"
 
-DEBUG = env("DEBUG")
+DEBUG = os.getenv("DEBUG", True)
 
 ALLOWED_HOSTS = ["yourchangelogs.herokuapp.com", "yourchangelogs.com", "127.0.0.1"]
 
@@ -62,8 +59,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "changelogger.wsgi.application"
-
-DATABASES = {"default": env.db()}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -114,6 +109,24 @@ LOGIN_REDIRECT_URL = "changelogs:index"
 LOGIN_URL = "login"
 
 # e-mail service sendgrid.com
-SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY", "no_sendgrid_api_key")
+SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY", None)
 
 NOREPLY_EMAIL_ADDRESS = "noreply@yourchangelogs.com"
+
+if DEBUG:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        }
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "HOST": os.getenv("DATABASE_HOST"),
+            "USER": os.getenv("DATABASE_USER"),
+            "PASSWORD": os.getenv("DATABASE_PASSWORD"),
+            "NAME": os.getenv("DATABASE_NAME"),
+        }
+    }
