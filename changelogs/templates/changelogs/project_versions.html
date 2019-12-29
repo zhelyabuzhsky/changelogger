@@ -1,11 +1,12 @@
 {% extends 'changelogs/base.html' %}
 
 {% block content %}
-    <h1 class="display-4">{{ project.title }}</h1>
+    <h1 class="display-2">{{ project.title }}</h1>
 
     {% for version in project.versions %}
         <div class="my-4">
-            <h2><a href="{% url 'changelogs:version_detail' project.id version.id %}">{{ version.title }}</a></h2>
+            <h2 class="display-4"><a
+                    href="{% url 'changelogs:version_detail' project.id version.id %}">{{ version.title }}</a></h2>
             {% include "changelogs/_version.html" with version=version %}
         </div>
     {% endfor %}

@@ -1,7 +1,7 @@
 {% extends 'changelogs/base.html' %}
 
 {% block content %}
-    <h1 class="display-4">Add version to {{ project.title }}</h1>
+    <h1 class="display-2">Add version to {{ project.title }}</h1>
 
     <form action="{% url 'changelogs:add_version' project.id %}" method="post">
         {% csrf_token %}
