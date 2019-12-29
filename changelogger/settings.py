@@ -130,3 +130,8 @@ else:
             "NAME": os.getenv("DATABASE_NAME", ""),
         }
     }
+
+# auto redirect to https
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SECURE_SSL_REDIRECT = True
