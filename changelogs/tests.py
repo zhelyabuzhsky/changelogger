@@ -1,13 +1,12 @@
 import datetime
 
 from django.contrib.auth.models import Group, Permission, User
-from django.test import RequestFactory, TestCase
+from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from .models import Project, Version
-from .views import projects
 
 
 class IndexViewTests(TestCase):
@@ -52,7 +51,6 @@ class ApiDocumentationViewTests(TestCase):
 
 class ProjectsViewTests(TestCase):
     def setUp(self):
-        self.factory = RequestFactory()
         self.user = User.objects.create_user(
             username="jacob", email="jacob@mail.com", password="top_secret"
         )
@@ -97,9 +95,8 @@ class ProjectsViewTests(TestCase):
         Project.objects.create(
             title="flask", is_public=True, url="https://github.com/pallets/flask"
         )
-        request = self.factory.get(reverse("changelogs:projects"))
-        request.user = self.user
-        response = projects(request)
+        self.client.login(username="jacob", password="top_secret")
+        response = self.client.get(reverse("changelogs:projects"))
         self.assertContains(response, "django")
         self.assertContains(response, "https://github.com/django/django")
         self.assertNotContains(response, "flask")
