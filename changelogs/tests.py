@@ -11,14 +11,14 @@ from .views import projects
 
 
 class IndexViewTests(TestCase):
-    def test_success(self):
+    def test_successful(self):
         response = self.client.get(reverse("changelogs:index"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Collector for changelogs")
 
 
 class AboutViewTests(TestCase):
-    def test_success(self):
+    def test_successful(self):
         response = self.client.get(reverse("changelogs:about"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(
@@ -27,7 +27,7 @@ class AboutViewTests(TestCase):
 
 
 class ApiDocumentationViewTests(TestCase):
-    def test_success(self):
+    def test_successful(self):
         response = self.client.get(reverse("changelogs:api_documentation"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Automate Changelogger via a simple API.")
@@ -95,7 +95,7 @@ class ProjectsViewTests(TestCase):
 
 
 class VersionDetailTests(TestCase):
-    def test_success(self):
+    def test_successful(self):
         project_django = Project.objects.create(
             title="django", url="https://github.com/django/django"
         )
