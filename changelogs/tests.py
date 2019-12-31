@@ -17,6 +17,22 @@ class IndexViewTests(TestCase):
         self.assertContains(response, "Collector for changelogs")
 
 
+class AboutViewTests(TestCase):
+    def test_success(self):
+        response = self.client.get(reverse("changelogs:about"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response, "Changelogger is a service to store all your changelogs"
+        )
+
+
+class ApiDocumentationViewTests(TestCase):
+    def test_success(self):
+        response = self.client.get(reverse("changelogs:api_documentation"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Automate Changelogger via a simple API.")
+
+
 class ProjectsViewTests(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
