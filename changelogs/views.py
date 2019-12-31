@@ -79,6 +79,9 @@ def version_detail(request, project_id: int, version_id: int):
 
 
 def profile(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("login"))
+
     template = loader.get_template("changelogs/profile.html")
     context = {"user": request.user}
     return HttpResponse(template.render(context, request))

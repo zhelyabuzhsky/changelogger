@@ -13,23 +13,40 @@ from .views import projects
 class IndexViewTests(TestCase):
     def test_successful(self):
         response = self.client.get(reverse("changelogs:index"))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Collector for changelogs")
 
 
 class AboutViewTests(TestCase):
     def test_successful(self):
         response = self.client.get(reverse("changelogs:about"))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(
             response, "Changelogger is a service to store all your changelogs"
         )
 
 
+class ProfileViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="jacob", email="jacob@mail.com", password="top_secret"
+        )
+
+    def tearDown(self):
+        self.user.delete()
+
+    def test_anonymous(self):
+        response = self.client.get(reverse("changelogs:profile"))
+        self.assertRedirects(response, reverse("login"))
+
+    def test_successful(self):
+        self.client.login(username="jacob", password="top_secret")
+        response = self.client.get(reverse("changelogs:profile"))
+        self.assertContains(response, "username: jacob")
+        self.assertContains(response, "e-mail: jacob@mail.com")
+
+
 class ApiDocumentationViewTests(TestCase):
     def test_successful(self):
         response = self.client.get(reverse("changelogs:api_documentation"))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Automate Changelogger via a simple API.")
 
 
@@ -45,7 +62,6 @@ class ProjectsViewTests(TestCase):
 
     def test_no_projects(self):
         response = self.client.get(reverse("changelogs:projects"))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "No projects are available =(")
         self.assertQuerysetEqual(response.context["projects_list"], [])
 
@@ -58,7 +74,6 @@ class ProjectsViewTests(TestCase):
         )
         Project.objects.create(title="flask", url="https://github.com/pallets/flask")
         response = self.client.get(reverse("changelogs:projects"))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "django")
         self.assertContains(response, "https://github.com/django/django")
         self.assertContains(response, "requests")
@@ -85,7 +100,6 @@ class ProjectsViewTests(TestCase):
         request = self.factory.get(reverse("changelogs:projects"))
         request.user = self.user
         response = projects(request)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "django")
         self.assertContains(response, "https://github.com/django/django")
         self.assertNotContains(response, "flask")
@@ -111,7 +125,6 @@ class VersionDetailTests(TestCase):
                 args=(project_django.id, version_django_1.id),
             )
         )
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "django-1.0.0")
         self.assertContains(response, "change one")
 
