@@ -1,0 +1,17 @@
+{% extends 'changelogs/base.html' %}
+
+{% block content %}
+    <h1 class="display-4">API Documentation</h1>
+    <p>Automate Changelogger via a simple API.</p>
+    <h3>Basic usage</h3>
+    <p>
+        API requests should be prefixed with api.
+    </p>
+    <p>
+        Example of a valid API request using cURL: <code>curl "https://yourchangeloggers.com/api/projects/"</code>
+    </p>
+
+    <p>
+        The API uses JSON to serialize data. You don’t need to specify .json at the end of an API URL.
+    </p>
+{% endblock %}

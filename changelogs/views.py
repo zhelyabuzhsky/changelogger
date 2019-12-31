@@ -42,6 +42,12 @@ def projects(request):
     return HttpResponse(template.render(context, request))
 
 
+def api_documentation(request):
+    template = loader.get_template("changelogs/api_documentation.html")
+    context = {}
+    return HttpResponse(template.render(context, request))
+
+
 def project_detail(request, project_id: int):
     template = loader.get_template("changelogs/project_detail.html")
     try:
