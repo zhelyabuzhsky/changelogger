@@ -78,6 +78,12 @@ def cabinet(request):
     return HttpResponse(template.render(context, request))
 
 
+def about(request):
+    template = loader.get_template("changelogs/about.html")
+    context = {}
+    return HttpResponse(template.render(context, request))
+
+
 class AddVersionView(View):
     def get(self, request, project_id: int):
         template = loader.get_template("changelogs/add_version.html")

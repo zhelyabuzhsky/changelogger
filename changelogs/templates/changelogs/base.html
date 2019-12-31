@@ -3,19 +3,21 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-46277263-13"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
+    {% if not debug %}
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-46277263-13"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
 
-        function gtag() {
-            dataLayer.push(arguments);
-        }
+            function gtag() {
+                dataLayer.push(arguments);
+            }
 
-        gtag('js', new Date());
+            gtag('js', new Date());
 
-        gtag('config', 'UA-46277263-13');
-    </script>
+            gtag('config', 'UA-46277263-13');
+        </script>
+    {% endif %}
 
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -69,7 +71,35 @@
 <main class="container">
     {% block content %}
     {% endblock %}
+    <footer class="pt-4 my-md-5 pt-md-5 border-top">
+        <div class="row">
+            <div class="col-12 col-md">
+                <a href="mailto:zhelyabuzhsky@icloud.com">Ilya Zhelyabuzhsky</a>
+                <small class="d-block mb-3 text-muted">© 2019-2020</small>
+            </div>
+            <div class="col-6 col-md">
+                <h5>Pages</h5>
+                <ul class="list-unstyled text-small">
+                    <li><a class="text-muted" href="{% url 'changelogs:feed' %}">Feed</a></li>
+                    <li><a class="text-muted" href="{% url 'changelogs:projects' %}">Projects list</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md">
+                <h5>Resources</h5>
+                <ul class="list-unstyled text-small">
+                    <li><a class="text-muted" href="/api/">API Documentation</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-md">
+                <h5>Product</h5>
+                <ul class="list-unstyled text-small">
+                    <li><a class="text-muted" href="{% url 'changelogs:about' %}">About</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
 </main><!-- /.container -->
+
 
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
