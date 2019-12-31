@@ -12,7 +12,7 @@ router.register(r"versions", views.VersionViewSet)
 urlpatterns = [
     path("", views.index, name="index"),
     path("feed/", views.feed, name="feed"),
-    path("cabinet/", views.cabinet, name="cabinet"),
+    path("profile/", views.profile, name="profile"),
     path("about/", views.about, name="about"),
     path("projects/", views.projects, name="projects"),
     path("projects/<int:project_id>/", views.project_detail, name="project_detail"),
