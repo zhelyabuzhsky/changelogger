@@ -1,20 +1,22 @@
-{% extends 'changelogs/base.html' %}
+{% extends 'changelogs/_base.html' %}
 
 {% block content %}
-    {% if projects_list %}
-        <h2 class="display-4">Projects</h2>
-        <ul>
-            {% for project in projects_list %}
-                <li><a href="{% url 'changelogs:project_detail' project.id %}">{{ project.title }}</a>
-                    (<a href="{{ project.url }}" target="_blank">{{ project.url }}</a> <i
-                            class="fas fa-external-link-alt"></i>)
+    <div class="container">
+        {% if projects_list %}
+            <h2 class="display-4">Projects</h2>
+            <ul>
+                {% for project in projects_list %}
+                    <li><a href="{% url 'changelogs:project_detail' project.id %}">{{ project.title }}</a>
+                        (<a href="{{ project.url }}" target="_blank">{{ project.url }}</a> <i
+                                class="fas fa-external-link-alt"></i>)
 
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <div class="alert alert-info" role="alert">
-            No projects are available =(
-        </div>
-    {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                No projects are available =(
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}

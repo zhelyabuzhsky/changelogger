@@ -1,19 +1,22 @@
-{% extends 'changelogs/base.html' %}
+{% extends 'changelogs/_base.html' %}
 
 {% block content %}
-    {% if versions %}
-        {% for version in versions %}
-            <div class="my-4">
-                <h2 class="display-4">
-                    <a href="{% url 'changelogs:project_detail' version.project.id %}">{{ version.project.title }}</a> (<a
-                        href="{% url 'changelogs:version_detail' version.project.id version.id %}">{{ version.title }}</a>)
-                </h2>
-                {% include "changelogs/_version.html" with version=version %}
+    <div class="container">
+        {% if versions %}
+            {% for version in versions %}
+                <div class="my-4">
+                    <h2 class="display-4">
+                        <a href="{% url 'changelogs:project_detail' version.project.id %}">{{ version.project.title }}</a>
+                        (<a
+                            href="{% url 'changelogs:version_detail' version.project.id version.id %}">{{ version.title }}</a>)
+                    </h2>
+                    {% include "changelogs/_version.html" with version=version %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                Empty feed =(
             </div>
-        {% endfor %}
-    {% else %}
-        <div class="alert alert-info" role="alert">
-            Empty feed =(
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
 {% endblock %}

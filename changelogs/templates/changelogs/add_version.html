@@ -1,20 +1,22 @@
-{% extends 'changelogs/base.html' %}
+{% extends 'changelogs/_base.html' %}
 
 {% block content %}
-    <h1 class="display-2">Add version to {{ project.title }}</h1>
+    <div class="container">
+        <h1 class="display-2">Add version to {{ project.title }}</h1>
 
-    <form action="{% url 'changelogs:add_version' project.id %}" method="post">
-        {% csrf_token %}
-        <div class="form-group">
-            <label for="title">Title</label>
-            <input name="title" class="form-control" id="title">
-        </div>
-        <div class="form-group">
-            <label for="body">Body</label>
-            <textarea class="form-control" name="body" id="body" rows="10" aria-describedby="bodyHelp"></textarea>
-            <small id="bodyHelp" class="form-text text-muted">Use <a
-                    href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">Markdown</a></small>
-        </div>
-        <input type="submit" class="btn btn-primary" value="Submit">
-    </form>
+        <form action="{% url 'changelogs:add_version' project.id %}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input name="title" class="form-control" id="title">
+            </div>
+            <div class="form-group">
+                <label for="body">Body</label>
+                <textarea class="form-control" name="body" id="body" rows="10" aria-describedby="bodyHelp"></textarea>
+                <small id="bodyHelp" class="form-text text-muted">Use <a
+                        href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">Markdown</a></small>
+            </div>
+            <input type="submit" class="btn btn-primary" value="Submit">
+        </form>
+    </div>
 {% endblock %}

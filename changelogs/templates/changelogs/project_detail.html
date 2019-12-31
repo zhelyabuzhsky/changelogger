@@ -1,34 +1,37 @@
-{% extends 'changelogs/base.html' %}
+{% extends 'changelogs/_base.html' %}
 {% load markdown_extras %}
 
 {% block content %}
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="display-4">{{ project.title }}</h1>
-        {% if user.is_authenticated %}
-            <div class="btn-toolbar mb-2 mb-md-0">
-                <div class="btn-group mr-2">
-                    <a class="btn btn-primary" href="{% url 'changelogs:add_version' project.id %}" role="button">
-                        Add version
-                    </a>
+    <div class="container">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="display-4">{{ project.title }}</h1>
+            {% if user.is_authenticated %}
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group mr-2">
+                        <a class="btn btn-primary" href="{% url 'changelogs:add_version' project.id %}" role="button">
+                            Add version
+                        </a>
+                    </div>
                 </div>
-            </div>
-        {% endif %}
+            {% endif %}
+        </div>
+
+        <p>
+            URL: <a href="{{ project.url }}" target="_blank">{{ project.url }}</a> <i
+                class="fas fa-external-link-alt"></i>
+        </p>
+
+        <div class="my-4">
+            <ul>
+                {% for version in project.versions|slice:":5" %}
+                    <li>
+                        <span class="text-secondary">{{ version.date_time }}</span> <a
+                            href="{% url 'changelogs:version_detail' project.id version.id %}">{{ version.title }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <a href="{% url 'changelogs:project_versions' project.id %}">All versions →</a>
     </div>
-
-    <p>
-        URL: <a href="{{ project.url }}" target="_blank">{{ project.url }}</a> <i class="fas fa-external-link-alt"></i>
-    </p>
-
-    <div class="my-4">
-        <ul>
-            {% for version in project.versions|slice:":5" %}
-                <li>
-                    <span class="text-secondary">{{ version.date_time }}</span> <a
-                        href="{% url 'changelogs:version_detail' project.id version.id %}">{{ version.title }}</a>
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <a href="{% url 'changelogs:project_versions' project.id %}">All versions →</a>
 {% endblock %}
