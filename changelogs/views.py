@@ -1,5 +1,6 @@
 import datetime
 
+from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
@@ -78,10 +79,8 @@ def version_detail(request, project_id: int, version_id: int):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def profile(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse("login"))
-
     template = loader.get_template("changelogs/profile.html")
     context = {"user": request.user}
     return HttpResponse(template.render(context, request))

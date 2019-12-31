@@ -34,7 +34,7 @@ class ProfileViewTests(TestCase):
 
     def test_anonymous(self):
         response = self.client.get(reverse("changelogs:profile"))
-        self.assertRedirects(response, reverse("login"))
+        self.assertRedirects(response, "/accounts/login/?next=/profile/")
 
     def test_successful(self):
         self.client.login(username="jacob", password="top_secret")
