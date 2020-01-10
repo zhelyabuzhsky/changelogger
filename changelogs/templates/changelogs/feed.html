@@ -14,9 +14,12 @@
                 </div>
             {% endfor %}
         {% else %}
-            <div class="alert alert-info" role="alert">
+            <div class="display-3 mt-5 mx-auto" role="alert">
                 Empty feed =(
             </div>
+            <p>
+                <a href="{% url 'changelogs:manage_subscriptions' %}">Manage your subscriptions</a>
+            </p>
         {% endif %}
     </div>
 {% endblock %}
