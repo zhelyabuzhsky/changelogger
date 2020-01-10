@@ -140,13 +140,13 @@ class ManageSubscriptionsView(LoginRequiredMixin, View):
         projects_list = Project.objects.order_by("title").all()
         for project in projects_list:
             if str(
-                    project.id
+                project.id
             ) in request.POST.keys() and not project.is_subscribed_by_user(
                 request.user
             ):
                 project.subscribers.add(request.user)
             if str(
-                    project.id
+                project.id
             ) not in request.POST.keys() and project.is_subscribed_by_user(
                 request.user
             ):
