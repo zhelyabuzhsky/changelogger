@@ -1,5 +1,6 @@
 import datetime
 
+import pytz
 from django.contrib.auth.models import Group, Permission, User
 from django.test import TestCase
 from django.urls import reverse
@@ -126,7 +127,7 @@ class VersionDetailTests(TestCase):
         )
         version_django_1 = Version.objects.create(
             title="1.0.0",
-            date_time=datetime.datetime.now(),
+            date_time=datetime.datetime.now(tz=pytz.utc),
             project=project_django,
             body="* change one* change two",
         )
@@ -193,7 +194,7 @@ class RestApiTests(APITestCase):
             "/api/versions/",
             {
                 "title": "0.1.0",
-                "date_time": datetime.datetime.now(),
+                "date_time": datetime.datetime.now(tz=pytz.utc),
                 "body": "small fixes",
                 "project": 1,
             },
@@ -210,7 +211,7 @@ class RestApiTests(APITestCase):
             "/api/versions/",
             {
                 "title": "0.1.0",
-                "date_time": datetime.datetime.now(),
+                "date_time": datetime.datetime.now(tz=pytz.utc),
                 "body": "small fixes",
                 "project": 1,
             },
@@ -230,7 +231,7 @@ class RestApiTests(APITestCase):
             "/api/versions/",
             {
                 "title": "0.1.0",
-                "date_time": datetime.datetime.now(),
+                "date_time": datetime.datetime.now(tz=pytz.utc),
                 "body": "small fixes",
                 "project": sentry_project.id,
             },
@@ -249,7 +250,7 @@ class RestApiTests(APITestCase):
         project_django.subscribers.add(self.user)
         version_django_1 = Version.objects.create(
             title="1.0.0",
-            date_time=datetime.date(2019, 12, 4),
+            date_time=datetime.datetime(2019, 12, 4, tzinfo=pytz.utc),
             project=project_django,
             body="* change one* change two",
         )
