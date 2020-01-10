@@ -170,6 +170,28 @@ class ProjectModelTests(TestCase):
         )
         self.assertFalse(gitlab_project.is_github_project)
 
+    def test_str_representation(self):
+        sentry_project = Project.objects.create(
+            title="Sentry", url="https://github.com/getsentry/sentry"
+        )
+        self.assertEqual(
+            str(sentry_project), "Sentry (https://github.com/getsentry/sentry)"
+        )
+
+
+class VersionModelTests(TestCase):
+    def test_str_representation(self):
+        sentry_project = Project.objects.create(
+            title="Sentry", url="https://github.com/getsentry/sentry"
+        )
+        version_sentry_1 = Version.objects.create(
+            title="1.0.0",
+            date_time=datetime.datetime.now(tz=pytz.utc),
+            project=sentry_project,
+            body="* change one* change two",
+        )
+        self.assertEqual(str(version_sentry_1), "1.0.0 (Sentry)")
+
 
 class RestApiTests(APITestCase):
     def setUp(self):
