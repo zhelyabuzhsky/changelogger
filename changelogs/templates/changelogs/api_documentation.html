@@ -4,7 +4,7 @@
     <div class="container">
         <h1 class="display-4">API Documentation</h1>
         <p>Automate Changelogger via a simple API.</p>
-        <h3>Basic usage</h3>
+        <h2>Basic usage</h2>
         <p>
             API requests should be prefixed with api.
         </p>
@@ -14,5 +14,75 @@
         <p>
             The API uses JSON to serialize data. You don’t need to specify .json at the end of an API URL.
         </p>
+        <h2>Authentication</h2>
+        <p>
+            Most API requests require authentication, or will only return public data when authentication is not
+            provided. For those cases where it is not required, this will be mentioned in the documentation for each
+            individual endpoint. For example, the /projects/:id endpoint.
+        </p>
+        <p>
+            There is one way to authenticate with the Changelogger API:
+        </p>
+        <ul>
+            <li>
+                HTTP Basic Auth
+            </li>
+        </ul>
+        <h2>Project List</h2>
+        <p>
+            API endpoint that allows projects to be viewed or edited. No authentication is required.
+        </p>
+        <p>
+            <code>GET /api/projects/</code>
+        </p>
+        <h2>Add new version</h2>
+        <p>
+            API endpoint that allows to add new version.
+        </p>
+        <p>
+            <code>POST /api/versions/</code>
+        </p>
+        <p>Parameters:</p>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Attribute</th>
+                <th scope="col">Type</th>
+                <th scope="col">Required</th>
+                <th scope="col">Description</th>
+                <th scope="col">Example</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>title</td>
+                <td>string</td>
+                <td>yes</td>
+                <td>Title of release</td>
+                <td>v1.7.2</td>
+            </tr>
+            <tr>
+                <td>date_time</td>
+                <td>datetime</td>
+                <td>yes</td>
+                <td>Datetime of release</td>
+                <td>2020-01-10 07:14:24.310236</td>
+            </tr>
+            <tr>
+                <td>body</td>
+                <td>string</td>
+                <td>yes</td>
+                <td>Body of changelog</td>
+                <td>Some small changes</td>
+            </tr>
+            <tr>
+                <td>project</td>
+                <td>integer</td>
+                <td>yes</td>
+                <td>ID of project to add version</td>
+                <td>5</td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 {% endblock %}
