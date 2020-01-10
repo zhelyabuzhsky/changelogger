@@ -2,8 +2,9 @@
 
 {% block content %}
     <div class="container">
-        <h1 class="display-2">{{ project.title }}</h1>
-
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="display-3">{{ project.title }}</h1>
+        </div>
         {% for version in project.versions %}
             <div class="my-4">
                 <h2 class="display-4"><a

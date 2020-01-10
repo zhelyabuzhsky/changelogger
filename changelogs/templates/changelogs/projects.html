@@ -3,7 +3,9 @@
 {% block content %}
     <div class="container">
         {% if projects_list %}
-            <h2 class="display-4">Projects</h2>
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
+                <h1 class="display-3">Projects</h1>
+            </div>
             <ul>
                 {% for project in projects_list %}
                     <li><a href="{% url 'changelogs:project_detail' project.id %}">{{ project.title }}</a>
