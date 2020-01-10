@@ -43,6 +43,20 @@ class ProfileViewTests(TestCase):
         self.assertContains(response, "e-mail: jacob@mail.com")
 
 
+class ManageSubscriptionsViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="jacob", email="jacob@mail.com", password="top_secret"
+        )
+
+    def tearDown(self):
+        self.user.delete()
+
+    def test_anonymous(self):
+        response = self.client.get(reverse("changelogs:manage_subscriptions"))
+        self.assertRedirects(response, "/login/?next=/subscriptions/")
+
+
 class ApiDocumentationViewTests(TestCase):
     def test_successful(self):
         response = self.client.get(reverse("changelogs:api_documentation"))
