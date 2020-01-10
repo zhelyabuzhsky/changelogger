@@ -16,9 +16,10 @@
                 {% endfor %}
             </ul>
         {% else %}
-            <div class="alert alert-info" role="alert">
+            <div class="display-3 my-5" role="alert">
                 No projects are available =(
             </div>
+            <a href="{% url 'changelogs:manage_subscriptions' %}">Manage your subscriptions</a>
         {% endif %}
     </div>
 {% endblock %}
