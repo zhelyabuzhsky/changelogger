@@ -1,0 +1,26 @@
+{% extends 'changelogs/_base.html' %}
+
+{% block content %}
+    <div class="container">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
+            <h1 class="display-3">Manage subscriptions</h1>
+        </div>
+
+        <form action="{% url 'changelogs:manage_subscriptions' %}" method="post">
+            {% csrf_token %}
+            {% for project in projects_list %}
+                <div class="form-group form-check">
+                    {% if project.is_subscribed %}
+                        <input type="checkbox" class="form-check-input" id="check{{ project.id }}"
+                               name="{{ project.id }}" checked>
+                    {% else %}
+                        <input type="checkbox" class="form-check-input" id="check{{ project.id }}"
+                               name="{{ project.id }}">
+                    {% endif %}
+                    <label class="form-check-label" for="check{{ project.id }}">{{ project.title }}</label>
+                </div>
+            {% endfor %}
+            <input type="submit" class="btn btn-primary" value="Submit">
+        </form>
+    </div>
+{% endblock %}

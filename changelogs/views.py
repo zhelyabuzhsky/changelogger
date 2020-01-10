@@ -1,6 +1,7 @@
 import datetime
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
@@ -34,10 +35,10 @@ def projects(request):
     template = loader.get_template("changelogs/projects.html")
     if request.user.is_authenticated:
         projects_list = (
-            Project.objects.filter(subscribers=request.user).order_by("pk").all()
+            Project.objects.filter(subscribers=request.user).order_by("title").all()
         )
     else:
-        projects_list = Project.objects.filter(is_public=True).order_by("pk").all()
+        projects_list = Project.objects.filter(is_public=True).order_by("title").all()
 
     context = {"projects_list": projects_list}
     return HttpResponse(template.render(context, request))
@@ -121,6 +122,36 @@ class AddVersionView(View):
         return HttpResponseRedirect(
             reverse("changelogs:project_versions", args=(project.id,))
         )
+
+
+class ManageSubscriptionsView(LoginRequiredMixin, View):
+    def get(self, request):
+        template = loader.get_template("changelogs/manage_subscriptions.html")
+        projects_list = Project.objects.order_by("title").all()
+        for project in projects_list:
+            if project.is_subscribed_by_user(request.user):
+                project.is_subscribed = True
+            else:
+                project.is_subscribed = False
+        context = {"projects_list": projects_list}
+        return HttpResponse(template.render(context, request))
+
+    def post(self, request):
+        projects_list = Project.objects.order_by("title").all()
+        for project in projects_list:
+            if str(
+                    project.id
+            ) in request.POST.keys() and not project.is_subscribed_by_user(
+                request.user
+            ):
+                project.subscribers.add(request.user)
+            if str(
+                    project.id
+            ) not in request.POST.keys() and project.is_subscribed_by_user(
+                request.user
+            ):
+                project.subscribers.remove(request.user)
+        return HttpResponseRedirect(reverse("changelogs:manage_subscriptions"))
 
 
 class ProjectViewSet(viewsets.ModelViewSet):

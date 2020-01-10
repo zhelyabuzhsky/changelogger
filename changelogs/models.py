@@ -16,12 +16,15 @@ class Project(models.Model):
     is_public = models.BooleanField(default=False)
     subscribers = models.ManyToManyField(User, blank=True)
 
+    def is_subscribed_by_user(self, user: User) -> bool:
+        return user in self.subscribers.all()
+
     @property
-    def repository_owner(self):
+    def repository_owner(self) -> str:
         return urlparse(self.url).path.split("/")[1]
 
     @property
-    def repository_name(self):
+    def repository_name(self) -> str:
         return urlparse(self.url).path.split("/")[2]
 
     @property

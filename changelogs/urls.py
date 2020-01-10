@@ -14,6 +14,11 @@ urlpatterns = [
     path("feed/", views.feed, name="feed"),
     path("profile/", views.profile, name="profile"),
     path("about/", views.about, name="about"),
+    path(
+        "subscriptions/",
+        views.ManageSubscriptionsView.as_view(),
+        name="manage_subscriptions",
+    ),
     path("projects/", views.projects, name="projects"),
     path("projects/<int:project_id>/", views.project_detail, name="project_detail"),
     path(
