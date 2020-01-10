@@ -100,7 +100,7 @@ REST_FRAMEWORK = {
 
 if not DEBUG:
     sentry_sdk.init(
-        dsn="https://72cde10d9c2f4bce81b6f032a92ddba0@sentry.io/1546623",
+        dsn=os.getenv("SENTRY_DSN", ""),
         integrations=[DjangoIntegration()],
     )
 
@@ -136,4 +136,5 @@ if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SECURE_SSL_REDIRECT = True
 
+# debug in templates
 INTERNAL_IPS = ("127.0.0.1",)
