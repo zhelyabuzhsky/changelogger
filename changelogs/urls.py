@@ -20,6 +20,11 @@ urlpatterns = [
         name="manage_subscriptions",
     ),
     path("projects/", views.projects, name="projects"),
+    path(
+        "projects/add",
+        views.AddProjectView.as_view(),
+        name="add_project",
+    ),
     path("projects/<int:project_id>/", views.project_detail, name="project_detail"),
     path(
         "projects/<int:project_id>/versions/",

@@ -5,6 +5,16 @@
         {% if projects_list %}
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
                 <h1 class="display-3">Projects</h1>
+                {% if user.is_authenticated %}
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group mr-2">
+                            <a class="btn btn-primary" href="{% url 'changelogs:add_project' %}"
+                               role="button">
+                                Add project
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
             <ul>
                 {% for project in projects_list %}
@@ -19,7 +29,14 @@
             <div class="display-3 my-5" role="alert">
                 No projects are available =(
             </div>
-            <a href="{% url 'changelogs:manage_subscriptions' %}">Manage your subscriptions</a>
+            <ul>
+                <li>
+                    <a href="{% url 'changelogs:add_project' %}">Add project</a>
+                </li>
+                <li>
+                    <a href="{% url 'changelogs:manage_subscriptions' %}">Manage your subscriptions</a>
+                </li>
+            </ul>
         {% endif %}
     </div>
 {% endblock %}
