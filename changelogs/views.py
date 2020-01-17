@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.views import View
 from rest_framework import viewsets
 
-from .models import Project, ProjectForm, Version
+from .models import Project, ProjectForm, Version, VersionForm
 from .serializers import ProjectSerializer, VersionSerializer
 from .services import send_email_notifications
 
@@ -120,7 +120,8 @@ class AddVersionView(View):
             project = Project.objects.get(pk=project_id)
         except Project.DoesNotExist:
             raise Http404("Project does not exist")
-        context = {"project": project}
+        form = VersionForm()
+        context = {"project": project, "form": form}
         return HttpResponse(template.render(context, request))
 
     def post(self, request, project_id: int):
@@ -129,19 +130,23 @@ class AddVersionView(View):
         except Project.DoesNotExist:
             raise Http404("Project does not exist")
 
-        version = Version(
-            title=request.POST.get("title"),
-            date_time=datetime.datetime.now(),
-            project=project,
-            body=request.POST.get("body"),
-        )
-        version.save()
+        template = loader.get_template("changelogs/add_version.html")
 
-        send_email_notifications(version)
+        form = VersionForm(request.POST)
+        if form.is_valid():
+            version = form.instance
+            version.date_time = datetime.datetime.now()
+            version.project = project
+            version.save()
+            send_email_notifications(version)
 
-        return HttpResponseRedirect(
-            reverse("changelogs:project_versions", args=(project.id,))
-        )
+            return HttpResponseRedirect(
+                reverse("changelogs:project_versions", args=(project.id,))
+            )
+        else:
+            return HttpResponse(
+                template.render({"project": project, "form": form}, request)
+            )
 
 
 class ManageSubscriptionsView(LoginRequiredMixin, View):
