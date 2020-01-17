@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.views import View
 from rest_framework import viewsets
 
-from .models import Project, Version
+from .models import Project, ProjectForm, Version
 from .serializers import ProjectSerializer, VersionSerializer
 from .services import send_email_notifications
 
@@ -91,6 +91,26 @@ def about(request):
     template = loader.get_template("changelogs/about.html")
     context = {}
     return HttpResponse(template.render(context, request))
+
+
+class AddProjectView(View):
+    def get(self, request):
+        template = loader.get_template("changelogs/add_project.html")
+        form = ProjectForm()
+        context = {"form": form}
+        return HttpResponse(template.render(context, request))
+
+    def post(self, request):
+        template = loader.get_template("changelogs/add_project.html")
+        form = ProjectForm(request.POST)
+        if form.is_valid():
+            project = form.save()
+            project.subscribers.add(request.user)
+            project.save()
+
+            return HttpResponseRedirect(reverse("changelogs:projects"))
+        else:
+            return HttpResponse(template.render({"form": form}, request))
 
 
 class AddVersionView(View):

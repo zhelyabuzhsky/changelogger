@@ -2,6 +2,7 @@ from urllib.parse import urlparse
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.forms import CheckboxInput, ModelForm, TextInput
 
 GITHUB_DOMAIN_NAME = "github.com"
 
@@ -11,8 +12,8 @@ class Project(models.Model):
         db_table = "projects"
         ordering = ["id"]
 
-    title = models.CharField(max_length=200)
-    url = models.URLField(max_length=200)
+    title = models.CharField(max_length=50)
+    url = models.URLField(max_length=100)
     is_public = models.BooleanField(default=False)
     subscribers = models.ManyToManyField(User, blank=True)
 
@@ -37,6 +38,17 @@ class Project(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.url})"
+
+
+class ProjectForm(ModelForm):
+    class Meta:
+        model = Project
+        fields = ["title", "url", "is_public"]
+        widgets = {
+            "title": TextInput(attrs={"class": "form-control"}),
+            "url": TextInput(attrs={"class": "form-control"}),
+            "is_public": CheckboxInput(attrs={"class": "form-check-input"}),
+        }
 
 
 class Version(models.Model):
