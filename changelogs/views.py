@@ -97,7 +97,7 @@ class AddProjectView(View):
     def get(self, request):
         template = loader.get_template("changelogs/add_project.html")
         form = ProjectForm()
-        context = {'form': form}
+        context = {"form": form}
         return HttpResponse(template.render(context, request))
 
     def post(self, request):
@@ -108,11 +108,9 @@ class AddProjectView(View):
             project.subscribers.add(request.user)
             project.save()
 
-            return HttpResponseRedirect(
-                reverse("changelogs:projects")
-            )
+            return HttpResponseRedirect(reverse("changelogs:projects"))
         else:
-            return HttpResponse(template.render({'form': form}, request))
+            return HttpResponse(template.render({"form": form}, request))
 
 
 class AddVersionView(View):
@@ -162,13 +160,13 @@ class ManageSubscriptionsView(LoginRequiredMixin, View):
         projects_list = Project.objects.order_by("title").all()
         for project in projects_list:
             if str(
-                    project.id
+                project.id
             ) in request.POST.keys() and not project.is_subscribed_by_user(
                 request.user
             ):
                 project.subscribers.add(request.user)
             if str(
-                    project.id
+                project.id
             ) not in request.POST.keys() and project.is_subscribed_by_user(
                 request.user
             ):

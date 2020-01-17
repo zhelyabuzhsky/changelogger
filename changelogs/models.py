@@ -43,11 +43,11 @@ class Project(models.Model):
 class ProjectForm(ModelForm):
     class Meta:
         model = Project
-        fields = ['title', 'url', 'is_public']
+        fields = ["title", "url", "is_public"]
         widgets = {
-            'title': TextInput(attrs={'class': 'form-control'}),
-            'url': TextInput(attrs={'class': 'form-control'}),
-            'is_public': CheckboxInput(attrs={'class': 'form-check-input'}),
+            "title": TextInput(attrs={"class": "form-control"}),
+            "url": TextInput(attrs={"class": "form-control"}),
+            "is_public": CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
 
