@@ -5,4 +5,4 @@ class ChangelogsConfig(AppConfig):
     name = "changelogs"
 
     def ready(self):
-        pass
+        import changelogs.signals
