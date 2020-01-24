@@ -6,8 +6,12 @@
             <h1 class="display-3">Profile</h1>
         </div>
         <ul>
-            <li>username: {{ user.username }}</li>
-            <li>e-mail: {{ user.email }}</li>
+            {% if user.first_name and user.last_name %}
+                <li>name: {{ user.first_name }} {{ user.last_name }}</li>
+            {% endif %}
+            {% if user.email %}
+                <li>e-mail: {{ user.email }}</li>
+            {% endif %}
         </ul>
     </div>
 {% endblock %}

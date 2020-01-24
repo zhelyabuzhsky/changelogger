@@ -10,7 +10,11 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", True)
 
 DEBUG = os.getenv("DEBUG", True)
 
-ALLOWED_HOSTS = ["yourchangelogs.herokuapp.com", "yourchangelogs.com", "127.0.0.1"]
+ALLOWED_HOSTS = [
+    "yourchangelogs.herokuapp.com",
+    "yourchangelogs.com",
+    "127.0.0.1",
+]
 
 INSTALLED_APPS = [
     "changelogs.apps.ChangelogsConfig",
@@ -21,6 +25,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "social_django",
 ]
 
 MIDDLEWARE = [
@@ -32,6 +37,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "social_django.middleware.SocialAuthExceptionMiddleware",
 ]
 
 ROOT_URLCONF = "changelogger.urls"
@@ -47,6 +53,8 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "social_django.context_processors.backends",
+                "social_django.context_processors.login_redirect",
             ]
         },
     }
@@ -126,3 +134,12 @@ if not DEBUG:
 
 # debug in templates
 INTERNAL_IPS = ("127.0.0.1",)
+
+# social auth
+AUTHENTICATION_BACKENDS = (
+    "social_core.backends.github.GithubOAuth2",
+    "django.contrib.auth.backends.ModelBackend",
+)
+
+SOCIAL_AUTH_GITHUB_KEY = os.getenv("GITHUB_CLIENT_ID", "")
+SOCIAL_AUTH_GITHUB_SECRET = os.getenv("GITHUB_CLIENT_SECRET", "")

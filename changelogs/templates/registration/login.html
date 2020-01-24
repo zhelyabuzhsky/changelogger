@@ -21,6 +21,10 @@
                     Please try again.
                 </div>
             {% endif %}
+
+            <div class="form-group">
+                or <a href="{% url 'social:begin' 'github' %}">Login with GitHub</a>
+            </div>
             <input type="submit" value="Login"
                    class="btn btn-primary pull-right"/>
             <input type="hidden" name="next" value="{{ next }}"/>
