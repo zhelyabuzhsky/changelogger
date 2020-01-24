@@ -124,7 +124,7 @@ class ProjectsViewTests(TestCase):
         self.assertNotContains(response, "https://github.com/psf/requests")
 
 
-class VersionDetailTests(TestCase):
+class VersionDetailViewTests(TestCase):
     def test_successful(self):
         project_django = Project.objects.create(
             title="django", url="https://github.com/django/django"
