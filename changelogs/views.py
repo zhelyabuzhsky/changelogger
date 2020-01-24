@@ -2,7 +2,7 @@ import datetime
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.template import loader
 from django.urls import reverse
@@ -54,10 +54,7 @@ def api_documentation(request):
 
 def project_detail(request, project_id: int):
     template = loader.get_template("changelogs/project_detail.html")
-    try:
-        project = Project.objects.get(pk=project_id)
-    except Project.DoesNotExist:
-        raise Http404("Project does not exist")
+    project = get_object_or_404(Project, pk=project_id)
     context = {"project": project}
     return HttpResponse(template.render(context, request))
 
@@ -157,13 +154,13 @@ class ManageSubscriptionsView(LoginRequiredMixin, View):
         projects_list = Project.objects.order_by("title").all()
         for project in projects_list:
             if str(
-                project.id
+                    project.id
             ) in request.POST.keys() and not project.is_subscribed_by_user(
                 request.user
             ):
                 project.subscribers.add(request.user)
             if str(
-                project.id
+                    project.id
             ) not in request.POST.keys() and project.is_subscribed_by_user(
                 request.user
             ):
