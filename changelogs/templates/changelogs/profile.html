@@ -12,6 +12,7 @@
             {% if user.email %}
                 <li>e-mail: {{ user.email }}</li>
             {% endif %}
+            <li>API token: {{ user.auth_token }}</li>
         </ul>
     </div>
 {% endblock %}
