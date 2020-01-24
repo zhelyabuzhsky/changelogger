@@ -14,7 +14,6 @@ ALLOWED_HOSTS = [
     "yourchangelogs.herokuapp.com",
     "yourchangelogs.com",
     "127.0.0.1",
-    "localhost",
 ]
 
 INSTALLED_APPS = [
@@ -142,5 +141,5 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
 )
 
-SOCIAL_AUTH_GITHUB_KEY = "432ec0292cdaf31f5527"
-SOCIAL_AUTH_GITHUB_SECRET = "0e86c7e8fd45f21808abc9eb39720ef5fc429d30"
+SOCIAL_AUTH_GITHUB_KEY = os.getenv("GITHUB_CLIENT_ID", "")
+SOCIAL_AUTH_GITHUB_SECRET = os.getenv("GITHUB_CLIENT_SECRET", "")
