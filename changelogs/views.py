@@ -1,99 +1,103 @@
 import datetime
 
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.template import loader
 from django.urls import reverse
 from django.views import View
 from rest_framework import viewsets
 
-from .models import Project, ProjectForm, Version, VersionForm
+from .forms import ProjectForm, VersionForm
+from .models import Project, Version
 from .serializers import ProjectSerializer, VersionSerializer
 from .services import send_email_notifications
 
 
-def index(request):
-    template = loader.get_template("changelogs/index.html")
-    context = {}
-    return HttpResponse(template.render(context, request))
+class IndexView(View):
+    def get(self, request):
+        template = loader.get_template("changelogs/index.html")
+        context = {}
+        return HttpResponse(template.render(context, request))
 
 
-def feed(request):
-    template = loader.get_template("changelogs/feed.html")
+class FeedView(View):
+    def get(self, request):
+        template = loader.get_template("changelogs/feed.html")
 
-    if request.user.is_authenticated:
-        versions = Version.objects.filter(project__subscribers=request.user).all()
-    else:
-        versions = Version.objects.filter(project__is_public=True).all()
+        if request.user.is_authenticated:
+            versions = Version.objects.filter(project__subscribers=request.user).all()
+        else:
+            versions = Version.objects.filter(project__is_public=True).all()
 
-    context = {"versions": versions}
-    return HttpResponse(template.render(context, request))
+        context = {"versions": versions}
+        return HttpResponse(template.render(context, request))
 
 
-def projects(request):
-    template = loader.get_template("changelogs/projects.html")
-    if request.user.is_authenticated:
-        projects_list = (
-            Project.objects.filter(subscribers=request.user).order_by("title").all()
+class ProjectsView(View):
+    def get(self, request):
+        template = loader.get_template("changelogs/projects.html")
+        if request.user.is_authenticated:
+            projects_list = (
+                Project.objects.filter(subscribers=request.user).order_by("title").all()
+            )
+        else:
+            projects_list = (
+                Project.objects.filter(is_public=True).order_by("title").all()
+            )
+
+        context = {"projects_list": projects_list}
+        return HttpResponse(template.render(context, request))
+
+
+class ApiDocumentationView(View):
+    def get(self, request):
+        template = loader.get_template("changelogs/api_documentation.html")
+        context = {}
+        return HttpResponse(template.render(context, request))
+
+
+class ProjectDetailView(View):
+    def get(self, request, project_id: int):
+        template = loader.get_template("changelogs/project_detail.html")
+        project = get_object_or_404(Project, pk=project_id)
+        context = {"project": project}
+        return HttpResponse(template.render(context, request))
+
+
+class ProjectVersionsView(View):
+    def get(self, request, project_id: int):
+        template = loader.get_template("changelogs/project_versions.html")
+        project = get_object_or_404(Project, pk=project_id)
+        context = {"project": project}
+        return HttpResponse(template.render(context, request))
+
+
+class VersionDetailView(View):
+    def get(self, request, project_id: int, version_id: int):
+        template = loader.get_template("changelogs/version_detail.html")
+        version = get_object_or_404(
+            Version.objects.filter(project_id=project_id), pk=version_id
         )
-    else:
-        projects_list = Project.objects.filter(is_public=True).order_by("title").all()
-
-    context = {"projects_list": projects_list}
-    return HttpResponse(template.render(context, request))
+        context = {"version": version}
+        return HttpResponse(template.render(context, request))
 
 
-def api_documentation(request):
-    template = loader.get_template("changelogs/api_documentation.html")
-    context = {}
-    return HttpResponse(template.render(context, request))
+class ProfileView(LoginRequiredMixin, View):
+    def get(self, request):
+        template = loader.get_template("changelogs/profile.html")
+        context = {"user": request.user}
+        return HttpResponse(template.render(context, request))
 
 
-def project_detail(request, project_id: int):
-    template = loader.get_template("changelogs/project_detail.html")
-    try:
-        project = Project.objects.get(pk=project_id)
-    except Project.DoesNotExist:
-        raise Http404("Project does not exist")
-    context = {"project": project}
-    return HttpResponse(template.render(context, request))
+class AboutView(View):
+    def get(self, request):
+        template = loader.get_template("changelogs/about.html")
+        context = {}
+        return HttpResponse(template.render(context, request))
 
 
-def project_versions(request, project_id: int):
-    template = loader.get_template("changelogs/project_versions.html")
-    try:
-        project = Project.objects.get(pk=project_id)
-    except Project.DoesNotExist:
-        raise Http404("Project does not exist")
-    context = {"project": project}
-    return HttpResponse(template.render(context, request))
-
-
-def version_detail(request, project_id: int, version_id: int):
-    template = loader.get_template("changelogs/version_detail.html")
-    try:
-        version = Version.objects.filter(project_id=project_id).get(pk=version_id)
-    except Version.DoesNotExist:
-        raise Http404("Version does not exist")
-    context = {"version": version}
-    return HttpResponse(template.render(context, request))
-
-
-@login_required
-def profile(request):
-    template = loader.get_template("changelogs/profile.html")
-    context = {"user": request.user}
-    return HttpResponse(template.render(context, request))
-
-
-def about(request):
-    template = loader.get_template("changelogs/about.html")
-    context = {}
-    return HttpResponse(template.render(context, request))
-
-
-class AddProjectView(View):
+class AddProjectView(LoginRequiredMixin, View):
     def get(self, request):
         template = loader.get_template("changelogs/add_project.html")
         form = ProjectForm()
@@ -113,22 +117,16 @@ class AddProjectView(View):
             return HttpResponse(template.render({"form": form}, request))
 
 
-class AddVersionView(View):
+class AddVersionView(LoginRequiredMixin, View):
     def get(self, request, project_id: int):
         template = loader.get_template("changelogs/add_version.html")
-        try:
-            project = Project.objects.get(pk=project_id)
-        except Project.DoesNotExist:
-            raise Http404("Project does not exist")
+        project = get_object_or_404(Project, pk=project_id)
         form = VersionForm()
         context = {"project": project, "form": form}
         return HttpResponse(template.render(context, request))
 
     def post(self, request, project_id: int):
-        try:
-            project = Project.objects.get(pk=project_id)
-        except Project.DoesNotExist:
-            raise Http404("Project does not exist")
+        project = get_object_or_404(Project, pk=project_id)
 
         template = loader.get_template("changelogs/add_version.html")
 
