@@ -27,7 +27,11 @@ class AboutViewTests(TestCase):
 class ProfileViewTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
-            username="jacob", email="jacob@mail.com", password="top_secret"
+            username="jacob",
+            email="jacob@mail.com",
+            password="top_secret",
+            first_name="Jacob",
+            last_name="Smith",
         )
 
     def tearDown(self):
@@ -40,7 +44,7 @@ class ProfileViewTests(TestCase):
     def test_successful(self):
         self.client.login(username="jacob", password="top_secret")
         response = self.client.get(reverse("changelogs:profile"))
-        self.assertContains(response, "username: jacob")
+        self.assertContains(response, "name: Jacob Smith")
         self.assertContains(response, "e-mail: jacob@mail.com")
 
 

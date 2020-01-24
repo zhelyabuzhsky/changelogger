@@ -20,7 +20,13 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {{ user.username }}
+                            {% if user.first_name  and user.last_name %}
+                                {{ user.first_name }} {{ user.last_name }}
+                            {% elif user.email %}
+                                {{ user.email }}
+                            {% else %}
+                                {{ user.username }}
+                            {% endif %}
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                             <a class="dropdown-item" href="{% url 'changelogs:profile' %}">Profile</a>
