@@ -149,6 +149,42 @@ class VersionDetailTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
+class AddVersionViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="jacob", email="jacob@mail.com", password="top_secret"
+        )
+
+    def tearDown(self):
+        self.user.delete()
+
+    def test_get_successful(self):
+        self.client.login(username="jacob", password="top_secret")
+        project_django = Project.objects.create(
+            title="Django", url="https://github.com/django/django"
+        )
+        response = self.client.get(
+            reverse("changelogs:add_version", args=(project_django.id,),)
+        )
+        self.assertContains(response, "Title")
+        self.assertContains(response, "Body")
+        self.assertContains(response, "Add version to Django")
+
+    def test_get_anonymous(self):
+        project_django = Project.objects.create(
+            title="Django", url="https://github.com/django/django"
+        )
+        response = self.client.get(
+            reverse("changelogs:add_version", args=(project_django.id,),)
+        )
+        self.assertEqual(response.status_code, 302)
+
+    def test_get_wrong_project_id(self):
+        self.client.login(username="jacob", password="top_secret")
+        response = self.client.get(reverse("changelogs:add_version", args=(1000,),))
+        self.assertEqual(response.status_code, 404)
+
+
 class ProjectModelTests(TestCase):
     def test_repository_owner_property(self):
         sentry_project = Project.objects.create(
@@ -303,3 +339,25 @@ class RestApiTests(APITestCase):
             response.json(),
             {"id": 1, "title": "django", "url": "https://github.com/django/django"},
         )
+
+
+class AddProjectViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="jacob", email="jacob@mail.com", password="top_secret"
+        )
+
+    def tearDown(self):
+        self.user.delete()
+
+    def test_get_successful(self):
+        self.client.login(username="jacob", password="top_secret")
+        response = self.client.get(reverse("changelogs:add_project"))
+        self.assertContains(response, "Title")
+        self.assertContains(response, "URL")
+        self.assertContains(response, "Is public?")
+        self.assertContains(response, "Add project")
+
+    def test_anonymous(self):
+        response = self.client.get(reverse("changelogs:add_project"))
+        self.assertEqual(response.status_code, 302)

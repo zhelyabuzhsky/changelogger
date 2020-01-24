@@ -3,12 +3,14 @@ import datetime
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.template import loader
 from django.urls import reverse
 from django.views import View
 from rest_framework import viewsets
 
-from .models import Project, ProjectForm, Version, VersionForm
+from .forms import ProjectForm, VersionForm
+from .models import Project, Version
 from .serializers import ProjectSerializer, VersionSerializer
 from .services import send_email_notifications
 
@@ -62,20 +64,16 @@ def project_detail(request, project_id: int):
 
 def project_versions(request, project_id: int):
     template = loader.get_template("changelogs/project_versions.html")
-    try:
-        project = Project.objects.get(pk=project_id)
-    except Project.DoesNotExist:
-        raise Http404("Project does not exist")
+    project = get_object_or_404(Project, pk=project_id)
     context = {"project": project}
     return HttpResponse(template.render(context, request))
 
 
 def version_detail(request, project_id: int, version_id: int):
     template = loader.get_template("changelogs/version_detail.html")
-    try:
-        version = Version.objects.filter(project_id=project_id).get(pk=version_id)
-    except Version.DoesNotExist:
-        raise Http404("Version does not exist")
+    version = get_object_or_404(
+        Version.objects.filter(project_id=project_id), pk=project_id
+    )
     context = {"version": version}
     return HttpResponse(template.render(context, request))
 
@@ -93,7 +91,7 @@ def about(request):
     return HttpResponse(template.render(context, request))
 
 
-class AddProjectView(View):
+class AddProjectView(LoginRequiredMixin, View):
     def get(self, request):
         template = loader.get_template("changelogs/add_project.html")
         form = ProjectForm()
@@ -113,22 +111,16 @@ class AddProjectView(View):
             return HttpResponse(template.render({"form": form}, request))
 
 
-class AddVersionView(View):
+class AddVersionView(LoginRequiredMixin, View):
     def get(self, request, project_id: int):
         template = loader.get_template("changelogs/add_version.html")
-        try:
-            project = Project.objects.get(pk=project_id)
-        except Project.DoesNotExist:
-            raise Http404("Project does not exist")
+        project = get_object_or_404(Project, pk=project_id)
         form = VersionForm()
         context = {"project": project, "form": form}
         return HttpResponse(template.render(context, request))
 
     def post(self, request, project_id: int):
-        try:
-            project = Project.objects.get(pk=project_id)
-        except Project.DoesNotExist:
-            raise Http404("Project does not exist")
+        project = get_object_or_404(Project, pk=project_id)
 
         template = loader.get_template("changelogs/add_version.html")
 
