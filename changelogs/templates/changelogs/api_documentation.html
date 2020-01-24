@@ -23,13 +23,31 @@
             individual endpoint. For example, the /projects/:id endpoint.
         </p>
         <p>
-            There is one way to authenticate with the Changelogger API:
+            There is one way to authenticate with the Changelogger's API: Token Authentication.
         </p>
-        <ul>
-            <li>
-                HTTP Basic Auth
-            </li>
-        </ul>
+        <p>
+            This authentication scheme uses a simple token-based HTTP Authentication scheme. Token authentication is
+            appropriate for client-server setups, such as native desktop and mobile clients.
+        </p>
+        <p>
+            For clients to authenticate, the token key should be included in the Authorization HTTP header. The API
+            token you can copy on your <a href="{% url 'changelogs:profile' %}"> Profile page</a>. The key should be
+            prefixed
+            by the string literal "Token", with whitespace
+            separating the two strings. For example:
+        </p>
+        <p>
+            <code>Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b</code>
+        </p>
+        <p>
+            Unauthenticated responses that are denied permission will result in an HTTP 401 Unauthorized response with
+            an appropriate WWW-Authenticate header. For example:
+        </p>
+        <p>
+            <code>
+                WWW-Authenticate: Token
+            </code>
+        </p>
         <h2>Project List</h2>
         <p>
             API endpoint that allows projects to be viewed or edited. No authentication is required.

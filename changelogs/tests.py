@@ -46,6 +46,7 @@ class ProfileViewTests(TestCase):
         response = self.client.get(reverse("changelogs:profile"))
         self.assertContains(response, "name: Jacob Smith")
         self.assertContains(response, "e-mail: jacob@mail.com")
+        self.assertContains(response, f"API token: {self.user.auth_token}")
 
 
 class ManageSubscriptionsViewTests(TestCase):
@@ -146,7 +147,7 @@ class VersionDetailViewTests(TestCase):
 
     def test_wrong_version(self):
         response = self.client.get(reverse("changelogs:version_detail", args=(1, 1)))
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class AddVersionViewTests(TestCase):
@@ -177,12 +178,12 @@ class AddVersionViewTests(TestCase):
         response = self.client.get(
             reverse("changelogs:add_version", args=(project_django.id,),)
         )
-        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, "/login/?next=/projects/1/versions/add")
 
     def test_get_wrong_project_id(self):
         self.client.login(username="jacob", password="top_secret")
         response = self.client.get(reverse("changelogs:add_version", args=(1000,),))
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class ProjectModelTests(TestCase):
@@ -262,12 +263,12 @@ class RestApiTests(APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_create_new_version_wrong_permissions(self):
         self.group.permissions.remove(Permission.objects.get(name="Can add version"))
 
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.user, token=self.user.auth_token)
 
         response = self.client.post(
             "/api/versions/",
@@ -288,7 +289,7 @@ class RestApiTests(APITestCase):
 
         self.assertEqual(Version.objects.count(), 0)
 
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.user, token=self.user.auth_token)
         response = self.client.post(
             "/api/versions/",
             {
@@ -316,7 +317,7 @@ class RestApiTests(APITestCase):
             project=project_django,
             body="* change one* change two",
         )
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.user, token=self.user.auth_token)
         response = self.client.get(f"/api/versions/{version_django_1.id}/")
         self.assertEqual(
             response.json(),
@@ -333,7 +334,7 @@ class RestApiTests(APITestCase):
         project_django = Project.objects.create(
             title="django", url="https://github.com/django/django"
         )
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.user, token=self.user.auth_token)
         response = self.client.get(f"/api/projects/{project_django.id}/")
         self.assertEqual(
             response.json(),
@@ -360,4 +361,4 @@ class AddProjectViewTests(TestCase):
 
     def test_anonymous(self):
         response = self.client.get(reverse("changelogs:add_project"))
-        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, "/login/?next=/projects/add")
