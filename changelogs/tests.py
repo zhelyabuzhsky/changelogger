@@ -1,5 +1,6 @@
 import datetime
 
+import django.db.models.deletion
 import pytz
 from django.contrib.auth.models import Group, Permission, User
 from django.test import TestCase
@@ -74,9 +75,6 @@ class ProjectsViewTests(TestCase):
         self.user = User.objects.create_user(
             username="jacob", email="jacob@mail.com", password="top_secret"
         )
-
-    def tearDown(self):
-        self.user.delete()
 
     def test_no_projects(self):
         response = self.client.get(reverse("changelogs:projects"))
@@ -156,16 +154,13 @@ class AddVersionViewTests(TestCase):
             username="jacob", email="jacob@mail.com", password="top_secret"
         )
 
-    def tearDown(self):
-        self.user.delete()
-
     def test_get_successful(self):
         self.client.login(username="jacob", password="top_secret")
         project_django = Project.objects.create(
             title="Django", url="https://github.com/django/django"
         )
         response = self.client.get(
-            reverse("changelogs:add_version", args=(project_django.id,),)
+            reverse("changelogs:add_version", args=(project_django.id,), )
         )
         self.assertContains(response, "Title")
         self.assertContains(response, "Body")
@@ -176,17 +171,22 @@ class AddVersionViewTests(TestCase):
             title="Django", url="https://github.com/django/django"
         )
         response = self.client.get(
-            reverse("changelogs:add_version", args=(project_django.id,),)
+            reverse("changelogs:add_version", args=(project_django.id,), )
         )
         self.assertRedirects(response, "/login/?next=/projects/1/versions/add")
 
     def test_get_wrong_project_id(self):
         self.client.login(username="jacob", password="top_secret")
-        response = self.client.get(reverse("changelogs:add_version", args=(1000,),))
+        response = self.client.get(reverse("changelogs:add_version", args=(1000,), ))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class ProjectModelTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="jacob", email="jacob@mail.com", password="top_secret"
+        )
+
     def test_repository_owner_property(self):
         sentry_project = Project.objects.create(
             title="Sentry", url="https://github.com/getsentry/sentry"
@@ -219,6 +219,13 @@ class ProjectModelTests(TestCase):
             str(sentry_project), "Sentry (https://github.com/getsentry/sentry)"
         )
 
+    def test_project_owner_delete(self):
+        Project.objects.create(
+            title="Sentry", url="https://github.com/getsentry/sentry", owner=self.user
+        )
+        with self.assertRaises(django.db.models.deletion.ProtectedError):
+            self.user.delete()
+
 
 class VersionModelTests(TestCase):
     def test_str_representation(self):
@@ -247,10 +254,6 @@ class RestApiTests(APITestCase):
             username="jacob", email="jacob@mail.com", password="top_secret"
         )
         self.user.groups.add(self.group)
-
-    def tearDown(self):
-        self.user.delete()
-        self.group.delete()
 
     def test_create_new_version_anonymous(self):
         response = self.client.post(
@@ -347,9 +350,6 @@ class AddProjectViewTests(TestCase):
         self.user = User.objects.create_user(
             username="jacob", email="jacob@mail.com", password="top_secret"
         )
-
-    def tearDown(self):
-        self.user.delete()
 
     def test_get_successful(self):
         self.client.login(username="jacob", password="top_secret")
