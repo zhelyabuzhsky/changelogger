@@ -160,7 +160,7 @@ class AddVersionViewTests(TestCase):
             title="Django", url="https://github.com/django/django"
         )
         response = self.client.get(
-            reverse("changelogs:add_version", args=(project_django.id,), )
+            reverse("changelogs:add_version", args=(project_django.id,),)
         )
         self.assertContains(response, "Title")
         self.assertContains(response, "Body")
@@ -171,13 +171,13 @@ class AddVersionViewTests(TestCase):
             title="Django", url="https://github.com/django/django"
         )
         response = self.client.get(
-            reverse("changelogs:add_version", args=(project_django.id,), )
+            reverse("changelogs:add_version", args=(project_django.id,),)
         )
         self.assertRedirects(response, "/login/?next=/projects/1/versions/add")
 
     def test_get_wrong_project_id(self):
         self.client.login(username="jacob", password="top_secret")
-        response = self.client.get(reverse("changelogs:add_version", args=(1000,), ))
+        response = self.client.get(reverse("changelogs:add_version", args=(1000,),))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
@@ -358,6 +358,20 @@ class AddProjectViewTests(TestCase):
         self.assertContains(response, "URL")
         self.assertContains(response, "Is public?")
         self.assertContains(response, "Add project")
+
+    def test_post_successful(self):
+        self.assertEqual(Project.objects.count(), 0)
+        self.client.login(username="jacob", password="top_secret")
+        response = self.client.post(
+            reverse("changelogs:add_project"),
+            {"title": "Django", "url": "https://github.com/django/django"},
+        )
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        project = Project.objects.first()
+        self.assertEqual(project.title, "Django")
+        self.assertEqual(project.url, "https://github.com/django/django")
+        self.assertFalse(project.is_public)
+        self.assertEqual(project.owner, self.user)
 
     def test_anonymous(self):
         response = self.client.get(reverse("changelogs:add_project"))

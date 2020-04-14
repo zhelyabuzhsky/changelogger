@@ -110,6 +110,7 @@ class AddProjectView(LoginRequiredMixin, View):
         if form.is_valid():
             project = form.save()
             project.subscribers.add(request.user)
+            project.owner = request.user
             project.save()
 
             return HttpResponseRedirect(reverse("changelogs:projects"))
