@@ -2,13 +2,13 @@ import datetime
 
 import django.db.models.deletion
 import pytz
-from django.contrib.auth.models import Group, Permission, User
+from django.contrib.auth.models import Group, Permission
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from .models import Project, Version
+from .models import Project, User, Version
 
 
 class IndexViewTests(TestCase):

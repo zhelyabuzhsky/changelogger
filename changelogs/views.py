@@ -8,8 +8,8 @@ from django.urls import reverse
 from django.views import View
 from rest_framework import viewsets
 
-from .forms import ProjectForm, VersionForm
-from .models import Project, Version
+from .forms import ProjectForm, VersionForm, UserForm
+from .models import Project, Version, User
 from .serializers import ProjectSerializer, VersionSerializer
 from .services import send_email_notifications
 
@@ -86,8 +86,19 @@ class VersionDetailView(View):
 class ProfileView(LoginRequiredMixin, View):
     def get(self, request):
         template = loader.get_template("changelogs/profile.html")
-        context = {"user": request.user}
+        form = UserForm(instance=request.user)
+        context = {"user": request.user, "form": form}
         return HttpResponse(template.render(context, request))
+
+    def post(self, request):
+        template = loader.get_template("changelogs/profile.html")
+        form = UserForm(request.POST)
+        if form.is_valid():
+            request.user.gitlab_token = form.cleaned_data["gitlab_token"]
+            request.user.save()
+            return HttpResponseRedirect(reverse("changelogs:profile"))
+        else:
+            return HttpResponse(template.render({"form": form}, request))
 
 
 class AboutView(View):
