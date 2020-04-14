@@ -14,5 +14,16 @@
             {% endif %}
             <li>API token: {{ user.auth_token }}</li>
         </ul>
+        <form action="{% url 'changelogs:profile' %}" method="post">
+            {% csrf_token %}
+            <div class="form-group row">
+                <label for="{{ form.gitlab_token.id_for_label }}" class="col-sm-2 col-form-label">GitLab token</label>
+                <div class="col-sm-10">
+                    {{ form.gitlab_token }}
+                </div>
+                {{ form.gitlab_token.errors }}
+            </div>
+            <input type="submit" class="btn btn-primary" value="Submit">
+        </form>
     </div>
 {% endblock %}

@@ -6,7 +6,18 @@ from django.forms import (
     URLInput,
 )
 
-from .models import Project, Version
+from .models import Project, Version, User
+
+
+class UserForm(ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            "gitlab_token",
+        ]
+        widgets = {
+            "gitlab_token": TextInput(attrs={"class": "form-control"}),
+        }
 
 
 class ProjectForm(ModelForm):

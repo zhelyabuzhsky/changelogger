@@ -147,5 +147,7 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
 )
 
+AUTH_USER_MODEL = "changelogs.User"
+
 SOCIAL_AUTH_GITHUB_KEY = os.getenv("GITHUB_CLIENT_ID", "")
 SOCIAL_AUTH_GITHUB_SECRET = os.getenv("GITHUB_CLIENT_SECRET", "")
