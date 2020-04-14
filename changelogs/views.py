@@ -108,9 +108,10 @@ class AddProjectView(LoginRequiredMixin, View):
         template = loader.get_template("changelogs/add_project.html")
         form = ProjectForm(request.POST)
         if form.is_valid():
-            project = form.save()
-            project.subscribers.add(request.user)
+            project: Project = form.save(commit=False)
             project.owner = request.user
+            project.save()
+            project.subscribers.add(request.user)
             project.save()
 
             return HttpResponseRedirect(reverse("changelogs:projects"))

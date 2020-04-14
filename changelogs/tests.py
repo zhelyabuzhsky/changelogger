@@ -83,12 +83,20 @@ class ProjectsViewTests(TestCase):
 
     def test_anonymous(self):
         Project.objects.create(
-            title="django", is_public=True, url="https://github.com/django/django"
+            title="django",
+            is_public=True,
+            url="https://github.com/django/django",
+            owner=self.user,
         )
         Project.objects.create(
-            title="requests", is_public=True, url="https://github.com/psf/requests"
+            title="requests",
+            is_public=True,
+            url="https://github.com/psf/requests",
+            owner=self.user,
         )
-        Project.objects.create(title="flask", url="https://github.com/pallets/flask")
+        Project.objects.create(
+            title="flask", url="https://github.com/pallets/flask", owner=self.user
+        )
         response = self.client.get(reverse("changelogs:projects"))
         self.assertContains(response, "django")
         self.assertContains(response, "https://github.com/django/django")
@@ -106,12 +114,17 @@ class ProjectsViewTests(TestCase):
 
     def test_authorized_user(self):
         project_django = Project.objects.create(
-            title="django", url="https://github.com/django/django"
+            title="django", url="https://github.com/django/django", owner=self.user
         )
         project_django.subscribers.add(self.user)
-        Project.objects.create(title="requests", url="https://github.com/psf/requests")
         Project.objects.create(
-            title="flask", is_public=True, url="https://github.com/pallets/flask"
+            title="requests", url="https://github.com/psf/requests", owner=self.user
+        )
+        Project.objects.create(
+            title="flask",
+            is_public=True,
+            url="https://github.com/pallets/flask",
+            owner=self.user,
         )
         self.client.login(username="jacob", password="top_secret")
         response = self.client.get(reverse("changelogs:projects"))
@@ -124,9 +137,14 @@ class ProjectsViewTests(TestCase):
 
 
 class VersionDetailViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="jacob", email="jacob@mail.com", password="top_secret"
+        )
+
     def test_successful(self):
         project_django = Project.objects.create(
-            title="django", url="https://github.com/django/django"
+            title="django", url="https://github.com/django/django", owner=self.user
         )
         version_django_1 = Version.objects.create(
             title="1.0.0",
@@ -157,7 +175,7 @@ class AddVersionViewTests(TestCase):
     def test_get_successful(self):
         self.client.login(username="jacob", password="top_secret")
         project_django = Project.objects.create(
-            title="Django", url="https://github.com/django/django"
+            title="Django", url="https://github.com/django/django", owner=self.user
         )
         response = self.client.get(
             reverse("changelogs:add_version", args=(project_django.id,),)
@@ -167,13 +185,8 @@ class AddVersionViewTests(TestCase):
         self.assertContains(response, "Add version to Django")
 
     def test_get_anonymous(self):
-        project_django = Project.objects.create(
-            title="Django", url="https://github.com/django/django"
-        )
-        response = self.client.get(
-            reverse("changelogs:add_version", args=(project_django.id,),)
-        )
-        self.assertRedirects(response, "/login/?next=/projects/1/versions/add")
+        response = self.client.get(reverse("changelogs:add_version", args=(1000,),))
+        self.assertRedirects(response, "/login/?next=/projects/1000/versions/add")
 
     def test_get_wrong_project_id(self):
         self.client.login(username="jacob", password="top_secret")
@@ -189,31 +202,31 @@ class ProjectModelTests(TestCase):
 
     def test_repository_owner_property(self):
         sentry_project = Project.objects.create(
-            title="Sentry", url="https://github.com/getsentry/sentry"
+            title="Sentry", url="https://github.com/getsentry/sentry", owner=self.user
         )
         self.assertEqual(sentry_project.repository_owner, "getsentry")
 
     def test_repository_name_property(self):
         sentry_project = Project.objects.create(
-            title="Sentry", url="https://github.com/getsentry/sentry"
+            title="Sentry", url="https://github.com/getsentry/sentry", owner=self.user
         )
         self.assertEqual(sentry_project.repository_name, "sentry")
 
     def test_is_github_property_true(self):
         sentry_project = Project.objects.create(
-            title="Sentry", url="https://github.com/getsentry/sentry"
+            title="Sentry", url="https://github.com/getsentry/sentry", owner=self.user
         )
         self.assertTrue(sentry_project.is_github_project)
 
     def test_is_github_property_false(self):
         gitlab_project = Project.objects.create(
-            title="GitLab", url="https://gitlab.com/gitlab-org/gitlab"
+            title="GitLab", url="https://gitlab.com/gitlab-org/gitlab", owner=self.user
         )
         self.assertFalse(gitlab_project.is_github_project)
 
     def test_str_representation(self):
         sentry_project = Project.objects.create(
-            title="Sentry", url="https://github.com/getsentry/sentry"
+            title="Sentry", url="https://github.com/getsentry/sentry", owner=self.user
         )
         self.assertEqual(
             str(sentry_project), "Sentry (https://github.com/getsentry/sentry)"
@@ -228,9 +241,14 @@ class ProjectModelTests(TestCase):
 
 
 class VersionModelTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="jacob", email="jacob@mail.com", password="top_secret"
+        )
+
     def test_str_representation(self):
         sentry_project = Project.objects.create(
-            title="Sentry", url="https://github.com/getsentry/sentry"
+            title="Sentry", url="https://github.com/getsentry/sentry", owner=self.user
         )
         version_sentry_1 = Version.objects.create(
             title="1.0.0",
@@ -287,7 +305,7 @@ class RestApiTests(APITestCase):
 
     def test_create_new_version_successful(self):
         sentry_project = Project.objects.create(
-            title="Sentry", url="https://github.com/getsentry/sentry"
+            title="Sentry", url="https://github.com/getsentry/sentry", owner=self.user
         )
 
         self.assertEqual(Version.objects.count(), 0)
@@ -311,7 +329,7 @@ class RestApiTests(APITestCase):
 
     def test_view_version_successful(self):
         project_django = Project.objects.create(
-            title="django", url="https://github.com/django/django"
+            title="django", url="https://github.com/django/django", owner=self.user
         )
         project_django.subscribers.add(self.user)
         version_django_1 = Version.objects.create(
@@ -335,7 +353,7 @@ class RestApiTests(APITestCase):
 
     def test_view_project_successful(self):
         project_django = Project.objects.create(
-            title="django", url="https://github.com/django/django"
+            title="django", url="https://github.com/django/django", owner=self.user
         )
         self.client.force_authenticate(user=self.user, token=self.user.auth_token)
         response = self.client.get(f"/api/projects/{project_django.id}/")
