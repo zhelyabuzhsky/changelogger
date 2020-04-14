@@ -16,7 +16,7 @@ class Project(models.Model):
     is_public = models.BooleanField(default=False)
     subscribers = models.ManyToManyField(User, blank=True)
     owner = models.ForeignKey(
-        User, default=None, null=True, on_delete=models.PROTECT, related_name="+"
+        User, default=None, null=False, on_delete=models.PROTECT, related_name="owner"
     )
 
     def is_subscribed_by_user(self, user: User) -> bool:
