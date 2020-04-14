@@ -1,5 +1,6 @@
 import datetime
 
+import django.db.models.deletion
 import pytz
 from django.contrib.auth.models import Group, Permission, User
 from django.test import TestCase
@@ -74,9 +75,6 @@ class ProjectsViewTests(TestCase):
         self.user = User.objects.create_user(
             username="jacob", email="jacob@mail.com", password="top_secret"
         )
-
-    def tearDown(self):
-        self.user.delete()
 
     def test_no_projects(self):
         response = self.client.get(reverse("changelogs:projects"))
@@ -156,9 +154,6 @@ class AddVersionViewTests(TestCase):
             username="jacob", email="jacob@mail.com", password="top_secret"
         )
 
-    def tearDown(self):
-        self.user.delete()
-
     def test_get_successful(self):
         self.client.login(username="jacob", password="top_secret")
         project_django = Project.objects.create(
@@ -187,6 +182,11 @@ class AddVersionViewTests(TestCase):
 
 
 class ProjectModelTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="jacob", email="jacob@mail.com", password="top_secret"
+        )
+
     def test_repository_owner_property(self):
         sentry_project = Project.objects.create(
             title="Sentry", url="https://github.com/getsentry/sentry"
@@ -219,6 +219,13 @@ class ProjectModelTests(TestCase):
             str(sentry_project), "Sentry (https://github.com/getsentry/sentry)"
         )
 
+    def test_project_owner_delete(self):
+        Project.objects.create(
+            title="Sentry", url="https://github.com/getsentry/sentry", owner=self.user
+        )
+        with self.assertRaises(django.db.models.deletion.ProtectedError):
+            self.user.delete()
+
 
 class VersionModelTests(TestCase):
     def test_str_representation(self):
@@ -247,10 +254,6 @@ class RestApiTests(APITestCase):
             username="jacob", email="jacob@mail.com", password="top_secret"
         )
         self.user.groups.add(self.group)
-
-    def tearDown(self):
-        self.user.delete()
-        self.group.delete()
 
     def test_create_new_version_anonymous(self):
         response = self.client.post(
@@ -348,9 +351,6 @@ class AddProjectViewTests(TestCase):
             username="jacob", email="jacob@mail.com", password="top_secret"
         )
 
-    def tearDown(self):
-        self.user.delete()
-
     def test_get_successful(self):
         self.client.login(username="jacob", password="top_secret")
         response = self.client.get(reverse("changelogs:add_project"))
@@ -358,6 +358,20 @@ class AddProjectViewTests(TestCase):
         self.assertContains(response, "URL")
         self.assertContains(response, "Is public?")
         self.assertContains(response, "Add project")
+
+    def test_post_successful(self):
+        self.assertEqual(Project.objects.count(), 0)
+        self.client.login(username="jacob", password="top_secret")
+        response = self.client.post(
+            reverse("changelogs:add_project"),
+            {"title": "Django", "url": "https://github.com/django/django"},
+        )
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        project = Project.objects.first()
+        self.assertEqual(project.title, "Django")
+        self.assertEqual(project.url, "https://github.com/django/django")
+        self.assertFalse(project.is_public)
+        self.assertEqual(project.owner, self.user)
 
     def test_anonymous(self):
         response = self.client.get(reverse("changelogs:add_project"))
