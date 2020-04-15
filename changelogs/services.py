@@ -1,5 +1,4 @@
 import json
-import os
 from datetime import datetime
 from typing import Dict, List
 from urllib.parse import urlparse
@@ -60,7 +59,7 @@ def fetch_github_project(project: Project) -> None:
     )
 
     response = _run_graphql_query(
-        query, "https://api.github.com/graphql", os.environ["GITHUB_TOKEN"]
+        query, "https://api.github.com/graphql", project.owner.github_token
     )
 
     releases: List[Dict] = response["data"]["repository"]["releases"]["edges"]

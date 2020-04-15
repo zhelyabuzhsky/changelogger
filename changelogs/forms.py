@@ -18,12 +18,14 @@ class UserForm(ModelForm):
             "last_name",
             "email",
             "gitlab_token",
+            "github_token",
         ]
         widgets = {
             "first_name": TextInput(attrs={"class": "form-control"}),
             "last_name": TextInput(attrs={"class": "form-control"}),
             "email": EmailInput(attrs={"class": "form-control"}),
             "gitlab_token": TextInput(attrs={"class": "form-control"}),
+            "github_token": TextInput(attrs={"class": "form-control"}),
         }
 
 
