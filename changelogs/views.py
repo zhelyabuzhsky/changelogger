@@ -86,14 +86,24 @@ class VersionDetailView(View):
 class ProfileView(LoginRequiredMixin, View):
     def get(self, request):
         template = loader.get_template("changelogs/profile.html")
+        context = {"user": request.user}
+        return HttpResponse(template.render(context, request))
+
+
+class ProfileEditView(LoginRequiredMixin, View):
+    def get(self, request):
+        template = loader.get_template("changelogs/edit_profile.html")
         form = UserForm(instance=request.user)
         context = {"user": request.user, "form": form}
         return HttpResponse(template.render(context, request))
 
     def post(self, request):
-        template = loader.get_template("changelogs/profile.html")
+        template = loader.get_template("changelogs/edit_profile.html")
         form = UserForm(request.POST)
         if form.is_valid():
+            request.user.first_name = form.cleaned_data["first_name"]
+            request.user.last_name = form.cleaned_data["last_name"]
+            request.user.email = form.cleaned_data["email"]
             request.user.gitlab_token = form.cleaned_data["gitlab_token"]
             request.user.save()
             return HttpResponseRedirect(reverse("changelogs:profile"))

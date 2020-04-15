@@ -4,6 +4,13 @@
     <div class="container">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="display-3">Profile</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group mr-2">
+                        <a class="btn btn-primary" href="{% url 'changelogs:edit_profile' %}" role="button">
+                            Edit profile
+                        </a>
+                    </div>
+                </div>
         </div>
         <ul>
             {% if user.first_name and user.last_name %}
@@ -13,17 +20,9 @@
                 <li>e-mail: {{ user.email }}</li>
             {% endif %}
             <li>API token: {{ user.auth_token }}</li>
+            {% if user.gitlab_token %}
+                <li>GitLab token: {{ user.gitlab_token }}</li>
+            {% endif %}
         </ul>
-        <form action="{% url 'changelogs:profile' %}" method="post">
-            {% csrf_token %}
-            <div class="form-group row">
-                <label for="{{ form.gitlab_token.id_for_label }}" class="col-sm-2 col-form-label">GitLab token</label>
-                <div class="col-sm-10">
-                    {{ form.gitlab_token }}
-                </div>
-                {{ form.gitlab_token.errors }}
-            </div>
-            <input type="submit" class="btn btn-primary" value="Submit">
-        </form>
     </div>
 {% endblock %}
