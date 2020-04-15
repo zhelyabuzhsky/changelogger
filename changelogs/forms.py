@@ -4,6 +4,7 @@ from django.forms import (
     TextInput,
     Textarea,
     URLInput,
+    EmailInput,
 )
 
 from .models import Project, Version, User
@@ -13,9 +14,15 @@ class UserForm(ModelForm):
     class Meta:
         model = User
         fields = [
+            "first_name",
+            "last_name",
+            "email",
             "gitlab_token",
         ]
         widgets = {
+            "first_name": TextInput(attrs={"class": "form-control"}),
+            "last_name": TextInput(attrs={"class": "form-control"}),
+            "email": EmailInput(attrs={"class": "form-control"}),
             "gitlab_token": TextInput(attrs={"class": "form-control"}),
         }
 
