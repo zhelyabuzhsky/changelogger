@@ -8,6 +8,7 @@ GITHUB_DOMAIN_NAME = "github.com"
 
 class User(AbstractUser):
     gitlab_token = models.CharField(max_length=20, blank=True)
+    github_token = models.CharField(max_length=40, blank=True)
 
 
 class Project(models.Model):

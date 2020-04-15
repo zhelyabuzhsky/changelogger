@@ -105,6 +105,7 @@ class ProfileEditView(LoginRequiredMixin, View):
             request.user.last_name = form.cleaned_data["last_name"]
             request.user.email = form.cleaned_data["email"]
             request.user.gitlab_token = form.cleaned_data["gitlab_token"]
+            request.user.github_token = form.cleaned_data["github_token"]
             request.user.save()
             return HttpResponseRedirect(reverse("changelogs:profile"))
         else:

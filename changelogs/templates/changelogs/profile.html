@@ -23,6 +23,9 @@
             {% if user.gitlab_token %}
                 <li>GitLab token: {{ user.gitlab_token }}</li>
             {% endif %}
+            {% if user.github_token %}
+                <li>GitHub token: {{ user.github_token }}</li>
+            {% endif %}
         </ul>
     </div>
 {% endblock %}
