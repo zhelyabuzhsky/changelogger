@@ -108,7 +108,6 @@ def _get_gitlab_project_releases(project: Project) -> List[Dict]:
 
 def fetch_gitlab_project(project: Project) -> None:
     for release in _get_gitlab_project_releases(project):
-        print(release["name"], release["description"], release["released_at"])
         if not Version.objects.filter(project=project, title=release["name"]).exists():
             Version.objects.create(
                 title=release["name"],
