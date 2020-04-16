@@ -120,14 +120,9 @@ class ProfileEditView(LoginRequiredMixin, View):
 
     def post(self, request):
         template = loader.get_template("changelogs/edit_profile.html")
-        form = UserForm(request.POST)
+        form = UserForm(request.POST, instance=request.user)
         if form.is_valid():
-            request.user.first_name = form.cleaned_data["first_name"]
-            request.user.last_name = form.cleaned_data["last_name"]
-            request.user.email = form.cleaned_data["email"]
-            request.user.gitlab_token = form.cleaned_data["gitlab_token"]
-            request.user.github_token = form.cleaned_data["github_token"]
-            request.user.save()
+            form.save()
             return HttpResponseRedirect(reverse("changelogs:profile"))
         else:
             return HttpResponse(template.render({"form": form}, request))
