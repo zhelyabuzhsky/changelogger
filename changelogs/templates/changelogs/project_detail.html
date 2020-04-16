@@ -8,6 +8,11 @@
             {% if user.is_authenticated %}
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <div class="btn-group mr-2">
+                        <a class="btn btn-secondary" href="{% url 'changelogs:edit_project' project.id %}" role="button">
+                            Edit
+                        </a>
+                    </div>
+                    <div class="btn-group mr-2">
                         <a class="btn btn-primary" href="{% url 'changelogs:add_version' project.id %}" role="button">
                             Add version
                         </a>

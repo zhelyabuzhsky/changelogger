@@ -8,8 +8,8 @@ from django.urls import reverse
 from django.views import View
 from rest_framework import viewsets
 
-from .forms import ProjectForm, VersionForm, UserForm
-from .models import Project, Version, User
+from .forms import ProjectForm, UserForm, VersionForm
+from .models import Project, Version
 from .serializers import ProjectSerializer, VersionSerializer
 from .services import send_email_notifications
 
@@ -63,6 +63,27 @@ class ProjectDetailView(View):
         project = get_object_or_404(Project, pk=project_id)
         context = {"project": project}
         return HttpResponse(template.render(context, request))
+
+
+class ProjectEditView(View):
+    def get(self, request, project_id: int):
+        template = loader.get_template("changelogs/edit_project.html")
+        project = get_object_or_404(Project, pk=project_id)
+        form = ProjectForm(instance=project)
+        context = {"project": project, "form": form}
+        return HttpResponse(template.render(context, request))
+
+    def post(self, request, project_id: int):
+        template = loader.get_template("changelogs/edit_project.html")
+        project = get_object_or_404(Project, pk=project_id)
+        form = ProjectForm(request.POST, instance=project)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(
+                reverse("changelogs:project_detail", args=(project.id,))
+            )
+        else:
+            return HttpResponse(template.render({"form": form}, request))
 
 
 class ProjectVersionsView(View):

@@ -28,6 +28,11 @@ urlpatterns = [
         name="project_detail",
     ),
     path(
+        "projects/<int:project_id>/edit",
+        views.ProjectEditView.as_view(),
+        name="edit_project",
+    ),
+    path(
         "projects/<int:project_id>/versions/",
         views.ProjectVersionsView.as_view(),
         name="project_versions",

@@ -19,10 +19,11 @@ class Project(models.Model):
     title = models.CharField(max_length=50)
     url = models.URLField(max_length=100)
     is_public = models.BooleanField(default=False)
-    subscribers = models.ManyToManyField(User, blank=True)
+    subscribers = models.ManyToManyField(User, blank=True, related_name="subscribers")
     owner = models.ForeignKey(
         User, default=None, null=False, on_delete=models.PROTECT, related_name="owner"
     )
+    team = models.ManyToManyField(User, blank=True, related_name="team")
 
     def is_subscribed_by_user(self, user: User) -> bool:
         return user in self.subscribers.all()
