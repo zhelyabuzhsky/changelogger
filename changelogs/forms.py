@@ -5,6 +5,7 @@ from django.forms import (
     Textarea,
     URLInput,
     EmailInput,
+    SelectMultiple,
 )
 
 from .models import Project, Version, User
@@ -32,11 +33,12 @@ class UserForm(ModelForm):
 class ProjectForm(ModelForm):
     class Meta:
         model = Project
-        fields = ["title", "url", "is_public"]
+        fields = ["title", "url", "is_public", "team"]
         widgets = {
             "title": TextInput(attrs={"class": "form-control"}),
             "url": URLInput(attrs={"class": "form-control"}),
             "is_public": CheckboxInput(attrs={"class": "form-check-input"}),
+            "team": SelectMultiple(attrs={"class": "form-control"}),
         }
 
 

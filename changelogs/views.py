@@ -1,17 +1,17 @@
 import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.template import loader
 from django.urls import reverse
 from django.views import View
 from rest_framework import viewsets
 
-from .forms import ProjectForm, VersionForm, UserForm
-from .models import Project, Version, User
-from .serializers import ProjectSerializer, VersionSerializer
-from .services import send_email_notifications
+from changelogs.forms import ProjectForm, UserForm, VersionForm
+from changelogs.models import Project, Version
+from changelogs.serializers import ProjectSerializer, VersionSerializer
+from changelogs.services import send_email_notifications
 
 
 class IndexView(View):
@@ -60,9 +60,37 @@ class ApiDocumentationView(View):
 class ProjectDetailView(View):
     def get(self, request, project_id: int):
         template = loader.get_template("changelogs/project_detail.html")
-        project = get_object_or_404(Project, pk=project_id)
+        if request.user.is_anonymous:
+            project = get_object_or_404(Project, pk=project_id)
+            if not project.is_public:
+                return HttpResponseNotFound()
+        else:
+            project = get_object_or_404(
+                Project.objects.accessible_by_user(request.user), pk=project_id
+            )
         context = {"project": project}
         return HttpResponse(template.render(context, request))
+
+
+class ProjectEditView(View):
+    def get(self, request, project_id: int):
+        template = loader.get_template("changelogs/edit_project.html")
+        project = get_object_or_404(Project, pk=project_id)
+        form = ProjectForm(instance=project)
+        context = {"project": project, "form": form}
+        return HttpResponse(template.render(context, request))
+
+    def post(self, request, project_id: int):
+        template = loader.get_template("changelogs/edit_project.html")
+        project = get_object_or_404(Project, pk=project_id)
+        form = ProjectForm(request.POST, instance=project)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(
+                reverse("changelogs:project_detail", args=(project.id,))
+            )
+        else:
+            return HttpResponse(template.render({"form": form}, request))
 
 
 class ProjectVersionsView(View):
@@ -99,14 +127,9 @@ class ProfileEditView(LoginRequiredMixin, View):
 
     def post(self, request):
         template = loader.get_template("changelogs/edit_profile.html")
-        form = UserForm(request.POST)
+        form = UserForm(request.POST, instance=request.user)
         if form.is_valid():
-            request.user.first_name = form.cleaned_data["first_name"]
-            request.user.last_name = form.cleaned_data["last_name"]
-            request.user.email = form.cleaned_data["email"]
-            request.user.gitlab_token = form.cleaned_data["gitlab_token"]
-            request.user.github_token = form.cleaned_data["github_token"]
-            request.user.save()
+            form.save()
             return HttpResponseRedirect(reverse("changelogs:profile"))
         else:
             return HttpResponse(template.render({"form": form}, request))
@@ -144,7 +167,9 @@ class AddProjectView(LoginRequiredMixin, View):
 class AddVersionView(LoginRequiredMixin, View):
     def get(self, request, project_id: int):
         template = loader.get_template("changelogs/add_version.html")
-        project = get_object_or_404(Project, pk=project_id)
+        project = get_object_or_404(
+            Project.objects.accessible_by_user(request.user), pk=project_id
+        )
         form = VersionForm()
         context = {"project": project, "form": form}
         return HttpResponse(template.render(context, request))
@@ -171,10 +196,12 @@ class AddVersionView(LoginRequiredMixin, View):
             )
 
 
-class ManageSubscriptionsView(LoginRequiredMixin, View):
+class SubscriptionsView(LoginRequiredMixin, View):
     def get(self, request):
-        template = loader.get_template("changelogs/manage_subscriptions.html")
-        projects_list = Project.objects.order_by("title").all()
+        template = loader.get_template("changelogs/subscriptions.html")
+        projects_list = (
+            Project.objects.accessible_by_user(request.user).order_by("title").all()
+        )
         for project in projects_list:
             if project.is_subscribed_by_user(request.user):
                 project.is_subscribed = True
@@ -198,7 +225,7 @@ class ManageSubscriptionsView(LoginRequiredMixin, View):
                 request.user
             ):
                 project.subscribers.remove(request.user)
-        return HttpResponseRedirect(reverse("changelogs:manage_subscriptions"))
+        return HttpResponseRedirect(reverse("changelogs:subscriptions"))
 
 
 class ProjectViewSet(viewsets.ModelViewSet):

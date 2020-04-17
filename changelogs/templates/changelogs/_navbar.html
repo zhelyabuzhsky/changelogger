@@ -33,7 +33,7 @@
                             {% if user.is_staff %}
                                 <a class="dropdown-item" href="{% url 'admin:index' %}">Site administration</a>
                             {% endif %}
-                            <a class="dropdown-item" href="{% url 'changelogs:manage_subscriptions' %}">Manage
+                            <a class="dropdown-item" href="{% url 'changelogs:subscriptions' %}">Manage
                                 subscriptions</a>
                             <a class="dropdown-item" href="{% url 'logout' %}">Sign out</a>
                         </div>

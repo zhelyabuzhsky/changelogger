@@ -8,7 +8,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from .models import Project, User, Version
+from changelogs.models import Project, User, Version
 
 
 class IndexViewTests(TestCase):
@@ -35,9 +35,6 @@ class ProfileViewTests(TestCase):
             last_name="Smith",
         )
 
-    def tearDown(self):
-        self.user.delete()
-
     def test_anonymous(self):
         response = self.client.get(reverse("changelogs:profile"))
         self.assertRedirects(response, "/login/?next=/profile/")
@@ -50,17 +47,33 @@ class ProfileViewTests(TestCase):
         self.assertContains(response, f"API token: {self.user.auth_token}")
 
 
-class ManageSubscriptionsViewTests(TestCase):
+class SubscriptionsViewTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
             username="jacob", email="jacob@mail.com", password="top_secret"
         )
 
-    def tearDown(self):
-        self.user.delete()
+    def test_successful(self):
+        another_user = User.objects.create_user(
+            username="john", email="john@mail.com", password="my_password"
+        )
+        Project.objects.create(
+            title="django",
+            is_public=True,
+            url="https://github.com/django/django",
+            owner=self.user,
+        )
+        Project.objects.create(
+            title="requests", url="https://github.com/psf/requests", owner=another_user,
+        )
+        self.client.login(username="jacob", password="top_secret")
+        response = self.client.get(reverse("changelogs:subscriptions"))
+        self.assertContains(response, "Manage subscriptions")
+        self.assertContains(response, "django")
+        self.assertNotContains(response, "requests")
 
     def test_anonymous(self):
-        response = self.client.get(reverse("changelogs:manage_subscriptions"))
+        response = self.client.get(reverse("changelogs:subscriptions"))
         self.assertRedirects(response, "/login/?next=/subscriptions/")
 
 
@@ -166,6 +179,93 @@ class VersionDetailViewTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
+class ProjectDetailViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="jacob", email="jacob@mail.com", password="top_secret"
+        )
+
+    def test_logged_in_successful(self):
+        project_django = Project.objects.create(
+            title="django",
+            url="https://github.com/django/django",
+            owner=self.user,
+            is_public=False,
+        )
+        Version.objects.create(
+            title="1.0.0",
+            date_time=datetime.datetime.now(tz=pytz.utc),
+            project=project_django,
+            body="* change one* change two",
+        )
+
+        self.client.login(username="jacob", password="top_secret")
+        response = self.client.get(
+            reverse("changelogs:project_detail", args=(project_django.id,),)
+        )
+        self.assertContains(response, "django")
+
+    def test_logged_in_wrong_permissions(self):
+        another_user = User.objects.create_user(
+            username="john", email="john@mail.com", password="my_password"
+        )
+        project_django = Project.objects.create(
+            title="django",
+            url="https://github.com/django/django",
+            owner=another_user,
+            is_public=False,
+        )
+        Version.objects.create(
+            title="1.0.0",
+            date_time=datetime.datetime.now(tz=pytz.utc),
+            project=project_django,
+            body="* change one* change two",
+        )
+
+        self.client.login(username="jacob", password="top_secret")
+        response = self.client.get(
+            reverse("changelogs:project_detail", args=(project_django.id,),)
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_anonymous_successful(self):
+        project_django = Project.objects.create(
+            title="django",
+            url="https://github.com/django/django",
+            owner=self.user,
+            is_public=True,
+        )
+        Version.objects.create(
+            title="1.0.0",
+            date_time=datetime.datetime.now(tz=pytz.utc),
+            project=project_django,
+            body="* change one* change two",
+        )
+        response = self.client.get(
+            reverse("changelogs:project_detail", args=(project_django.id,),)
+        )
+        self.assertContains(response, "django")
+
+    def test_anonymous_404(self):
+        project_django = Project.objects.create(
+            title="django",
+            url="https://github.com/django/django",
+            owner=self.user,
+            is_public=False,
+        )
+        Version.objects.create(
+            title="1.0.0",
+            date_time=datetime.datetime.now(tz=pytz.utc),
+            project=project_django,
+            body="* change one* change two",
+        )
+        response = self.client.get(
+            reverse("changelogs:project_detail", args=(project_django.id,),)
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
 class AddVersionViewTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
@@ -238,6 +338,39 @@ class ProjectModelTests(TestCase):
         )
         with self.assertRaises(django.db.models.deletion.ProtectedError):
             self.user.delete()
+
+    def test_accessible_by_user_filter(self):
+        user = User.objects.create_user(
+            username="sherlock", email="sherlock@mail.com", password="top_secret"
+        )
+        another_user = User.objects.create_user(
+            username="john", email="john@mail.com", password="my_password"
+        )
+        project_1 = Project.objects.create(
+            title="Project1", url="https://github.com/me/project1", owner=user
+        )
+        project_2 = Project.objects.create(
+            title="Project2", url="https://github.com/me/project2", owner=another_user
+        )
+        project_3 = Project.objects.create(
+            title="Project3",
+            url="https://github.com/me/project3",
+            owner=user,
+            is_public=True,
+        )
+        project_4 = Project.objects.create(
+            title="Project4",
+            url="https://github.com/me/project4",
+            owner=another_user,
+            is_public=True,
+        )
+
+        projects = Project.objects.accessible_by_user(user).all()
+        self.assertEqual(len(projects), 3)
+        self.assertTrue(project_1 in projects)
+        self.assertTrue(project_2 not in projects)
+        self.assertTrue(project_3 in projects)
+        self.assertTrue(project_4 in projects)
 
 
 class VersionModelTests(TestCase):

@@ -6,7 +6,7 @@
             <h1 class="display-3">Manage subscriptions</h1>
         </div>
 
-        <form action="{% url 'changelogs:manage_subscriptions' %}" method="post">
+        <form action="{% url 'changelogs:subscriptions' %}" method="post">
             {% csrf_token %}
             {% for project in projects_list %}
                 <div class="form-group form-check">
