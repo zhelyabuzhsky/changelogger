@@ -190,7 +190,9 @@ class AddVersionView(LoginRequiredMixin, View):
 class SubscriptionsView(LoginRequiredMixin, View):
     def get(self, request):
         template = loader.get_template("changelogs/subscriptions.html")
-        projects_list = Project.objects.accessible_by_user(request.user).order_by("title").all()
+        projects_list = (
+            Project.objects.accessible_by_user(request.user).order_by("title").all()
+        )
         for project in projects_list:
             if project.is_subscribed_by_user(request.user):
                 project.is_subscribed = True

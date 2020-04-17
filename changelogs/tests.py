@@ -64,9 +64,7 @@ class SubscriptionsViewTests(TestCase):
             owner=self.user,
         )
         Project.objects.create(
-            title="requests",
-            url="https://github.com/psf/requests",
-            owner=another_user,
+            title="requests", url="https://github.com/psf/requests", owner=another_user,
         )
         self.client.login(username="jacob", password="top_secret")
         response = self.client.get(reverse("changelogs:subscriptions"))
