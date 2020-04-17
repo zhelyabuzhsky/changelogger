@@ -39,7 +39,10 @@ class ProjectsView(View):
         template = loader.get_template("changelogs/projects.html")
         if request.user.is_authenticated:
             projects_list = (
-                Project.objects.filter(subscribers=request.user).order_by("title").all()
+                Project.objects.accessible_by_user(request.user)
+                .filter(subscribers=request.user)
+                .order_by("title")
+                .all()
             )
         else:
             projects_list = (
