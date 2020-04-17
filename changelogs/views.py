@@ -1,5 +1,5 @@
 import datetime
-
+from django.http import HttpResponse, HttpResponseNotFound
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -60,7 +60,14 @@ class ApiDocumentationView(View):
 class ProjectDetailView(View):
     def get(self, request, project_id: int):
         template = loader.get_template("changelogs/project_detail.html")
-        project = get_object_or_404(Project, pk=project_id)
+        if request.user.is_anonymous:
+            project = get_object_or_404(Project, pk=project_id)
+            if not project.is_public:
+                return HttpResponseNotFound()
+        else:
+            project = get_object_or_404(
+                Project.objects.accessible_by_user(request.user), pk=project_id
+            )
         context = {"project": project}
         return HttpResponse(template.render(context, request))
 
@@ -160,7 +167,9 @@ class AddProjectView(LoginRequiredMixin, View):
 class AddVersionView(LoginRequiredMixin, View):
     def get(self, request, project_id: int):
         template = loader.get_template("changelogs/add_version.html")
-        project = get_object_or_404(Project, pk=project_id)
+        project = get_object_or_404(
+            Project.objects.accessible_by_user(request.user), pk=project_id
+        )
         form = VersionForm()
         context = {"project": project, "form": form}
         return HttpResponse(template.render(context, request))

@@ -179,6 +179,93 @@ class VersionDetailViewTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
+class ProjectDetailViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="jacob", email="jacob@mail.com", password="top_secret"
+        )
+
+    def test_logged_in_successful(self):
+        project_django = Project.objects.create(
+            title="django",
+            url="https://github.com/django/django",
+            owner=self.user,
+            is_public=False,
+        )
+        Version.objects.create(
+            title="1.0.0",
+            date_time=datetime.datetime.now(tz=pytz.utc),
+            project=project_django,
+            body="* change one* change two",
+        )
+
+        self.client.login(username="jacob", password="top_secret")
+        response = self.client.get(
+            reverse("changelogs:project_detail", args=(project_django.id,),)
+        )
+        self.assertContains(response, "django")
+
+    def test_logged_in_wrong_permissions(self):
+        another_user = User.objects.create_user(
+            username="john", email="john@mail.com", password="my_password"
+        )
+        project_django = Project.objects.create(
+            title="django",
+            url="https://github.com/django/django",
+            owner=another_user,
+            is_public=False,
+        )
+        Version.objects.create(
+            title="1.0.0",
+            date_time=datetime.datetime.now(tz=pytz.utc),
+            project=project_django,
+            body="* change one* change two",
+        )
+
+        self.client.login(username="jacob", password="top_secret")
+        response = self.client.get(
+            reverse("changelogs:project_detail", args=(project_django.id,),)
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_anonymous_successful(self):
+        project_django = Project.objects.create(
+            title="django",
+            url="https://github.com/django/django",
+            owner=self.user,
+            is_public=True,
+        )
+        Version.objects.create(
+            title="1.0.0",
+            date_time=datetime.datetime.now(tz=pytz.utc),
+            project=project_django,
+            body="* change one* change two",
+        )
+        response = self.client.get(
+            reverse("changelogs:project_detail", args=(project_django.id,),)
+        )
+        self.assertContains(response, "django")
+
+    def test_anonymous_404(self):
+        project_django = Project.objects.create(
+            title="django",
+            url="https://github.com/django/django",
+            owner=self.user,
+            is_public=False,
+        )
+        Version.objects.create(
+            title="1.0.0",
+            date_time=datetime.datetime.now(tz=pytz.utc),
+            project=project_django,
+            body="* change one* change two",
+        )
+        response = self.client.get(
+            reverse("changelogs:project_detail", args=(project_django.id,),)
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
 class AddVersionViewTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
