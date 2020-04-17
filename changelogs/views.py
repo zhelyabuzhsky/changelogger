@@ -225,7 +225,7 @@ class SubscriptionsView(LoginRequiredMixin, View):
                 request.user
             ):
                 project.subscribers.remove(request.user)
-        return HttpResponseRedirect(reverse("subscriptions"))
+        return HttpResponseRedirect(reverse("changelogs:subscriptions"))
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
