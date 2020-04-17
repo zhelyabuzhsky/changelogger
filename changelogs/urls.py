@@ -17,8 +17,8 @@ urlpatterns = [
     path("about/", views.AboutView.as_view(), name="about"),
     path(
         "subscriptions/",
-        views.ManageSubscriptionsView.as_view(),
-        name="manage_subscriptions",
+        views.SubscriptionsView.as_view(),
+        name="subscriptions",
     ),
     path("projects/", views.ProjectsView.as_view(), name="projects"),
     path("projects/add", views.AddProjectView.as_view(), name="add_project",),

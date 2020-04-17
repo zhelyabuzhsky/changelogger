@@ -35,9 +35,6 @@ class ProfileViewTests(TestCase):
             last_name="Smith",
         )
 
-    def tearDown(self):
-        self.user.delete()
-
     def test_anonymous(self):
         response = self.client.get(reverse("changelogs:profile"))
         self.assertRedirects(response, "/login/?next=/profile/")
@@ -50,17 +47,35 @@ class ProfileViewTests(TestCase):
         self.assertContains(response, f"API token: {self.user.auth_token}")
 
 
-class ManageSubscriptionsViewTests(TestCase):
+class SubscriptionsViewTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
             username="jacob", email="jacob@mail.com", password="top_secret"
         )
 
-    def tearDown(self):
-        self.user.delete()
+    def test_successful(self):
+        another_user = User.objects.create_user(
+            username="john", email="john@mail.com", password="my_password"
+        )
+        Project.objects.create(
+            title="django",
+            is_public=True,
+            url="https://github.com/django/django",
+            owner=self.user,
+        )
+        Project.objects.create(
+            title="requests",
+            url="https://github.com/psf/requests",
+            owner=another_user,
+        )
+        self.client.login(username="jacob", password="top_secret")
+        response = self.client.get(reverse("changelogs:subscriptions"))
+        self.assertContains(response, "Manage subscriptions")
+        self.assertContains(response, "django")
+        self.assertNotContains(response, "requests")
 
     def test_anonymous(self):
-        response = self.client.get(reverse("changelogs:manage_subscriptions"))
+        response = self.client.get(reverse("changelogs:subscriptions"))
         self.assertRedirects(response, "/login/?next=/subscriptions/")
 
 

@@ -187,10 +187,10 @@ class AddVersionView(LoginRequiredMixin, View):
             )
 
 
-class ManageSubscriptionsView(LoginRequiredMixin, View):
+class SubscriptionsView(LoginRequiredMixin, View):
     def get(self, request):
-        template = loader.get_template("changelogs/manage_subscriptions.html")
-        projects_list = Project.objects.order_by("title").all()
+        template = loader.get_template("changelogs/subscriptions.html")
+        projects_list = Project.objects.accessible_by_user(request.user).order_by("title").all()
         for project in projects_list:
             if project.is_subscribed_by_user(request.user):
                 project.is_subscribed = True
@@ -214,7 +214,7 @@ class ManageSubscriptionsView(LoginRequiredMixin, View):
                 request.user
             ):
                 project.subscribers.remove(request.user)
-        return HttpResponseRedirect(reverse("changelogs:manage_subscriptions"))
+        return HttpResponseRedirect(reverse("subscriptions"))
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
