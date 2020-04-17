@@ -2,6 +2,7 @@ from urllib.parse import urlparse
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import Q
 
 GITHUB_DOMAIN_NAME = "github.com"
 
@@ -9,6 +10,11 @@ GITHUB_DOMAIN_NAME = "github.com"
 class User(AbstractUser):
     gitlab_token = models.CharField(max_length=20, blank=True)
     github_token = models.CharField(max_length=40, blank=True)
+
+
+class ProjectQuerySet(models.QuerySet):
+    def accessible_by_user(self, user):
+        return self.filter(Q(team=user) | Q(owner=user) | Q(is_public=True))
 
 
 class Project(models.Model):
@@ -46,6 +52,8 @@ class Project(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.url})"
+
+    objects = ProjectQuerySet.as_manager()
 
 
 class Version(models.Model):

@@ -8,10 +8,10 @@ from django.urls import reverse
 from django.views import View
 from rest_framework import viewsets
 
-from .forms import ProjectForm, UserForm, VersionForm
-from .models import Project, Version
-from .serializers import ProjectSerializer, VersionSerializer
-from .services import send_email_notifications
+from changelogs.forms import ProjectForm, UserForm, VersionForm
+from changelogs.models import Project, Version
+from changelogs.serializers import ProjectSerializer, VersionSerializer
+from changelogs.services import send_email_notifications
 
 
 class IndexView(View):

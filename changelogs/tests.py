@@ -8,7 +8,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from .models import Project, User, Version
+from changelogs.models import Project, User, Version
 
 
 class IndexViewTests(TestCase):
@@ -238,6 +238,39 @@ class ProjectModelTests(TestCase):
         )
         with self.assertRaises(django.db.models.deletion.ProtectedError):
             self.user.delete()
+
+    def test_accessible_by_user_filter(self):
+        user = User.objects.create_user(
+            username="sherlock", email="sherlock@mail.com", password="top_secret"
+        )
+        another_user = User.objects.create_user(
+            username="john", email="john@mail.com", password="my_password"
+        )
+        project_1 = Project.objects.create(
+            title="Project1", url="https://github.com/me/project1", owner=user
+        )
+        project_2 = Project.objects.create(
+            title="Project2", url="https://github.com/me/project2", owner=another_user
+        )
+        project_3 = Project.objects.create(
+            title="Project3",
+            url="https://github.com/me/project3",
+            owner=user,
+            is_public=True,
+        )
+        project_4 = Project.objects.create(
+            title="Project4",
+            url="https://github.com/me/project4",
+            owner=another_user,
+            is_public=True,
+        )
+
+        projects = Project.objects.accessible_by_user(user).all()
+        self.assertEqual(len(projects), 3)
+        self.assertTrue(project_1 in projects)
+        self.assertTrue(project_2 not in projects)
+        self.assertTrue(project_3 in projects)
+        self.assertTrue(project_4 in projects)
 
 
 class VersionModelTests(TestCase):
