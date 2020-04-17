@@ -163,7 +163,11 @@ class VersionDetailViewTests(TestCase):
             title="1.0.0",
             date_time=datetime.datetime.now(tz=pytz.utc),
             project=project_django,
-            body="* change one* change two",
+            body=(
+                "* change one",
+                "* change two",
+                "![image](/uploads/c76c7e2525ac077aea6334e1f87c88b1/image.png)",
+            ),
         )
         response = self.client.get(
             reverse(
@@ -173,6 +177,16 @@ class VersionDetailViewTests(TestCase):
         )
         self.assertContains(response, "django-1.0.0")
         self.assertContains(response, "change one")
+        self.assertContains(
+            response,
+            """
+            <img
+                alt="image"
+                src="https://github.com/django/django/uploads/c76c7e2525ac077aea6334e1f87c88b1/image.png"
+            />
+            """,
+            html=True,
+        )
 
     def test_wrong_version(self):
         response = self.client.get(reverse("changelogs:version_detail", args=(1, 1)))

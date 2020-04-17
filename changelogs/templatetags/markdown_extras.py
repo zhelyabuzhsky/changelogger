@@ -1,11 +1,14 @@
 import markdown as md
 from django import template
-from django.template.defaultfilters import stringfilter
+
+from changelogs.models import Version
 
 register = template.Library()
 
 
 @register.filter()
-@stringfilter
-def markdown(value):
-    return md.markdown(value, extensions=["markdown.extensions.fenced_code"])
+def markdown(version: Version):
+    version.body = version.body.replace(
+        "(/uploads/", f"({version.project.url}/uploads/"
+    )
+    return md.markdown(version.body, extensions=["markdown.extensions.fenced_code"])
