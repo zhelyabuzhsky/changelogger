@@ -363,6 +363,8 @@ class ProjectModelTests(TestCase):
         project_1 = Project.objects.create(
             title="Project1", url="https://github.com/me/project1", owner=user
         )
+        project_1.team.add(user)
+        project_1.team.add(another_user)
         project_2 = Project.objects.create(
             title="Project2", url="https://github.com/me/project2", owner=another_user
         )

@@ -14,7 +14,7 @@ class User(AbstractUser):
 
 class ProjectQuerySet(models.QuerySet):
     def accessible_by_user(self, user):
-        return self.filter(Q(team=user) | Q(owner=user) | Q(is_public=True))
+        return self.filter(Q(team=user) | Q(owner=user) | Q(is_public=True)).distinct()
 
 
 class Project(models.Model):
