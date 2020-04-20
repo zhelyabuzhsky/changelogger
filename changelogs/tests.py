@@ -169,6 +169,7 @@ class VersionDetailViewTests(TestCase):
                 "![image](/uploads/c76c7e2525ac077aea6334e1f87c88b1/image.png)",
             ),
         )
+        self.client.login(username="jacob", password="top_secret")
         response = self.client.get(
             reverse(
                 "changelogs:version_detail",
@@ -190,6 +191,28 @@ class VersionDetailViewTests(TestCase):
 
     def test_wrong_version(self):
         response = self.client.get(reverse("changelogs:version_detail", args=(1, 1)))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_anonymous_wrong_permissions(self):
+        project_django = Project.objects.create(
+            title="django",
+            url="https://github.com/django/django",
+            owner=self.user,
+            is_public=False,
+        )
+        versions_django_1 = Version.objects.create(
+            title="1.0.0",
+            date_time=datetime.datetime.now(tz=pytz.utc),
+            project=project_django,
+            body="* change one* change two",
+        )
+        response = self.client.get(
+            reverse(
+                "changelogs:version_detail",
+                args=(project_django.id, versions_django_1.id,),
+            )
+        )
+
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
@@ -260,18 +283,12 @@ class ProjectDetailViewTests(TestCase):
         )
         self.assertContains(response, "django")
 
-    def test_anonymous_404(self):
+    def test_anonymous_wrong_permissions(self):
         project_django = Project.objects.create(
             title="django",
             url="https://github.com/django/django",
             owner=self.user,
             is_public=False,
-        )
-        Version.objects.create(
-            title="1.0.0",
-            date_time=datetime.datetime.now(tz=pytz.utc),
-            project=project_django,
-            body="* change one* change two",
         )
         response = self.client.get(
             reverse("changelogs:project_detail", args=(project_django.id,),)

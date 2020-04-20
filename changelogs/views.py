@@ -1,7 +1,7 @@
 import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.template import loader
 from django.urls import reverse
@@ -107,8 +107,16 @@ class ProjectVersionsView(View):
 class VersionDetailView(View):
     def get(self, request, project_id: int, version_id: int):
         template = loader.get_template("changelogs/version_detail.html")
+        if request.user.is_anonymous:
+            project = get_object_or_404(
+                Project.objects.filter(is_public=True), pk=project_id
+            )
+        else:
+            project = get_object_or_404(
+                Project.objects.accessible_by_user(request.user), pk=project_id
+            )
         version = get_object_or_404(
-            Version.objects.filter(project_id=project_id), pk=version_id
+            Version.objects.filter(project=project), pk=version_id
         )
         context = {"version": version}
         return HttpResponse(template.render(context, request))
