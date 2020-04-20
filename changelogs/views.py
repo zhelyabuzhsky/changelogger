@@ -11,7 +11,6 @@ from rest_framework import viewsets
 from changelogs.forms import ProjectForm, UserForm, VersionForm
 from changelogs.models import Project, Version
 from changelogs.serializers import ProjectSerializer, VersionSerializer
-from changelogs.services import send_email_notifications
 
 
 class IndexView(View):
@@ -196,7 +195,6 @@ class AddVersionView(LoginRequiredMixin, View):
             version.date_time = datetime.datetime.now()
             version.project = project
             version.save()
-            send_email_notifications(version)
 
             return HttpResponseRedirect(
                 reverse("changelogs:project_versions", args=(project.id,))

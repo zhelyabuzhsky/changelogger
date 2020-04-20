@@ -3,6 +3,7 @@ from urllib.parse import urlparse
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q
+import markdown as md
 
 GITHUB_DOMAIN_NAME = "github.com"
 
@@ -68,3 +69,8 @@ class Version(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.project.title})"
+
+    @property
+    def body_html(self):
+        body = self.body.replace("![image](/", f"![image]({self.project.url}/")
+        return md.markdown(body, extensions=["markdown.extensions.fenced_code"])
