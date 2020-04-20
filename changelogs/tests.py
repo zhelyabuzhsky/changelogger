@@ -3,7 +3,7 @@ import datetime
 import django.db.models.deletion
 import pytz
 from django.contrib.auth.models import Group, Permission
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -521,7 +521,7 @@ class AddProjectViewTests(TestCase):
         response = self.client.get(reverse("changelogs:add_project"))
         self.assertContains(response, "Title")
         self.assertContains(response, "URL")
-        self.assertContains(response, "Is public?")
+        self.assertContains(response, "Is public")
         self.assertContains(response, "Add project")
 
     def test_post_successful(self):
@@ -541,3 +541,11 @@ class AddProjectViewTests(TestCase):
     def test_anonymous(self):
         response = self.client.get(reverse("changelogs:add_project"))
         self.assertRedirects(response, "/login/?next=/projects/add")
+
+
+class CustomErrorHandlerTests(SimpleTestCase):
+    def test_handler_renders_template_response(self):
+        response = self.client.get("/404/")
+        self.assertContains(
+            response, "404 Page not found =(", status_code=status.HTTP_404_NOT_FOUND
+        )
