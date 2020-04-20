@@ -86,7 +86,7 @@ def _get_gitlab_project_id(project: Project) -> int:
             }
         }
     """ % (
-        urlparse(project.url).path[1:-1]
+        urlparse(project.url).path[1:]
     )
     response = _run_graphql_query(
         query,
