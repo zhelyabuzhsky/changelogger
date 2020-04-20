@@ -64,9 +64,9 @@ class ProjectDetailView(View):
     def get(self, request, project_id: int):
         template = loader.get_template("changelogs/project_detail.html")
         if request.user.is_anonymous:
-            project = get_object_or_404(Project, pk=project_id)
-            if not project.is_public:
-                return HttpResponseNotFound()
+            project = get_object_or_404(
+                Project.objects.filter(is_public=True), pk=project_id
+            )
         else:
             project = get_object_or_404(
                 Project.objects.accessible_by_user(request.user), pk=project_id
