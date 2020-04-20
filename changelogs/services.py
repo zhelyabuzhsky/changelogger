@@ -8,7 +8,7 @@ from django.conf import settings
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
-from .models import Project, Version
+from changelogs.models import Project, Version
 
 
 def send_email_notifications(version: Version) -> None:
@@ -18,8 +18,11 @@ def send_email_notifications(version: Version) -> None:
         message = Mail(
             from_email=settings.NOREPLY_EMAIL_ADDRESS,
             to_emails=user.email,
-            subject=f"It's new version of {version.project.title}",
-            html_content=f'It\'s new version ({version.title}) of <a href="{version.project.url}">{version.project.title}</a>',
+            subject=f"{version.project.title}-{version.title} released",
+            html_content=(
+                f"""<h1>{version.project.title}-{version.title}</h1>
+                {version.body_html}"""
+            ),
         )
         sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
         sg.send(message)
