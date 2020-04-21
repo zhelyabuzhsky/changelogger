@@ -370,6 +370,22 @@ class ProjectModelTests(TestCase):
         with self.assertRaises(django.db.models.deletion.ProtectedError):
             self.user.delete()
 
+    def test_is_subscribed_by_user(self):
+        user = User.objects.create_user(
+            username="sherlock", email="sherlock@mail.com", password="top_secret"
+        )
+        another_user = User.objects.create_user(
+            username="john", email="john@mail.com", password="my_password"
+        )
+
+        project = Project.objects.create(
+            title="Project", url="https://github.com/me/project", owner=user
+        )
+        project.subscribers.add(user)
+
+        self.assertTrue(project.is_subscribed_by_user(user))
+        self.assertFalse(project.is_subscribed_by_user(another_user))
+
     def test_accessible_by_user_filter(self):
         user = User.objects.create_user(
             username="sherlock", email="sherlock@mail.com", password="top_secret"
