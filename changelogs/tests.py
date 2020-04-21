@@ -566,5 +566,5 @@ class CustomErrorHandlerTests(SimpleTestCase):
     def test_handler_renders_template_response(self):
         response = self.client.get("/404/")
         self.assertContains(
-            response, "404 Page not found =(", status_code=status.HTTP_404_NOT_FOUND
+            response, "Page not found =(", status_code=status.HTTP_404_NOT_FOUND
         )
