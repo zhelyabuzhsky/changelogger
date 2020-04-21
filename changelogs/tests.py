@@ -1,14 +1,16 @@
 import datetime
 
-import django.db.models.deletion
 import pytz
 from django.contrib.auth.models import Group, Permission
+from django.core.exceptions import ValidationError
+from django.db.models.deletion import ProtectedError
 from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from changelogs.models import Project, User, Version
+from changelogs.validators import validate_project_url
 
 
 class IndexViewTests(TestCase):
@@ -367,7 +369,7 @@ class ProjectModelTests(TestCase):
         Project.objects.create(
             title="Sentry", url="https://github.com/getsentry/sentry", owner=self.user
         )
-        with self.assertRaises(django.db.models.deletion.ProtectedError):
+        with self.assertRaises(ProtectedError):
             self.user.delete()
 
     def test_is_subscribed_by_user(self):
@@ -578,9 +580,20 @@ class AddProjectViewTests(TestCase):
         self.assertRedirects(response, "/login/?next=/projects/add")
 
 
-class CustomErrorHandlerTests(SimpleTestCase):
-    def test_handler_renders_template_response(self):
+class ErrorTemplatesTests(SimpleTestCase):
+    def test_404(self):
         response = self.client.get("/404/")
         self.assertContains(
             response, "Page not found =(", status_code=status.HTTP_404_NOT_FOUND
+        )
+
+
+class ValidatorsTests(SimpleTestCase):
+    def test_validate_project_url(self):
+        validate_project_url("https://github.com/pallets/flask")
+        with self.assertRaises(ValidationError) as error_context:
+            validate_project_url("https://github.com/pallets/flask/")
+        self.assertEqual(
+            error_context.exception.message,
+            "Projects's URL has slash at the end, it's not required",
         )
