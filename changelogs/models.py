@@ -1,9 +1,11 @@
 from urllib.parse import urlparse
 
+import markdown as md
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q
-import markdown as md
+
+from changelogs.validators import validate_project_url
 
 GITHUB_DOMAIN_NAME = "github.com"
 
@@ -24,7 +26,7 @@ class Project(models.Model):
         ordering = ["id"]
 
     title = models.CharField(max_length=50)
-    url = models.URLField(max_length=100)
+    url = models.URLField(max_length=100, validators=[validate_project_url])
     is_public = models.BooleanField(default=False)
     subscribers = models.ManyToManyField(User, blank=True, related_name="subscribers")
     owner = models.ForeignKey(
