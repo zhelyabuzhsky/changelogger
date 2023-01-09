@@ -1,0 +1,48 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:15.0
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=development
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7.0
+
+  app: &app
+    build:
+      context: ..
+      dockerfile: ./dev/Dockerfile
+      target: development_build
+      args:
+        DJANGO_ENV: development
+    command: sh
+    volumes:
+      - '..:/usr/src/app'
+      - pip-data:/usr/local/lib/python3.11/site-packages
+      - bin-data:/usr/local/bin
+    env_file:
+      - .env.development
+    depends_on:
+      - db
+      - redis
+
+  web:
+    <<: *app
+    command:
+      - gunicorn
+      - --bind=0.0.0.0:8000
+      - --access-logfile=-
+      - --error-logfile=-
+      - --log-level=info
+      - --reload
+      - changelogger.wsgi
+    ports:
+      - "8000:8000"
+
+volumes:
+  pg-data:
+  pip-data:
+  bin-data:
